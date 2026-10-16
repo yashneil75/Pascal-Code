@@ -45,6 +45,8 @@ store.ensure_project(_project)
 _conversation: int | None = store.newest(_project)
 _model_name = config.DEFAULT_MODEL
 manager.select(_model_name)
+# Resuming the newest chat resumes its context as well.
+manager.set_history(store.load(_conversation) if _conversation is not None else [])
 
 
 # --- schemas ---------------------------------------------------------------
@@ -231,6 +233,9 @@ def new_chat() -> dict:
     global _conversation
     with _state_lock:
         _conversation = None
+    # The store starts empty, so the model's context must too -- otherwise
+    # replies keep answering the previous chat.
+    manager.reset_history()
     return {"conversation": None}
 
 
@@ -243,6 +248,8 @@ def open_chat(conversation_id: int) -> dict:
     if project is not None:
         with _state_lock:
             _project = project
+    # Continuing an old chat resumes its context, not the previous one's.
+    manager.set_history(store.load(conversation_id))
     return {"conversation": conversation_id, "project": _get_project()}
 
 

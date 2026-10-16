@@ -62,6 +62,15 @@ class MockModel:
     def stop(self) -> None:
         return None
 
+    def get_history(self) -> list[dict]:
+        return []
+
+    def set_history(self, messages: list[dict]) -> None:
+        return None
+
+    def reset_history(self) -> None:
+        return None
+
     def send_message(self, message: str) -> Iterator[str]:
         # Keep parity with Model: record nothing here; app.py owns history.
         reply = MOCK_REPLIES[self._n % len(MOCK_REPLIES)]
@@ -79,6 +88,7 @@ class Model:
         self.spec = spec_for(id)
         self._llm = None
         self._messages: list[dict] = []
+        self._gen = 0  # bumped whenever history is replaced; stale streams drop out
         self._lock = threading.Lock()
 
     @property
@@ -115,10 +125,37 @@ class Model:
         self._llm.close()
         self._llm = None
 
+    def get_history(self) -> list[dict]:
+        with self._lock:
+            return list(self._messages)
+
+    def set_history(self, messages: list[dict]) -> None:
+        """Replace context, e.g. when opening an existing chat.
+
+        Only plain turns survive: tool calls/results would be orphans without
+        their counterparts, and llama.cpp rejects them.
+        """
+        clean = [
+            {"role": m["role"], "content": m["content"]}
+            for m in messages
+            if m.get("role") in ("system", "user", "assistant")
+            and isinstance(m.get("content"), str)
+        ]
+        with self._lock:
+            self._messages = clean
+            self._gen += 1
+
+    def reset_history(self) -> None:
+        """Forget context, e.g. on new chat."""
+        with self._lock:
+            self._messages = []
+            self._gen += 1
+
     def send_message(self, message: str) -> Iterator[str]:
         if self._llm is None:
             raise RuntimeError("Model is not running. Call start() first.")
         with self._lock:
+            gen = self._gen
             self._messages.append({"role": "user", "content": message})
             history = list(self._messages)
         stream = self._llm.create_chat_completion(
@@ -133,7 +170,10 @@ class Model:
                 parts.append(delta)
                 yield delta
         with self._lock:
-            self._messages.append({"role": "assistant", "content": "".join(parts)})
+            # A chat switch mid-stream replaces history (bumping _gen); the
+            # stale reply belongs to no open chat, so it is not kept.
+            if gen == self._gen:
+                self._messages.append({"role": "assistant", "content": "".join(parts)})
 
 
 class ModelManager:
@@ -144,6 +184,10 @@ class ModelManager:
         self.name = name
         self._model: Model | MockModel | None = None
         self._loading = False
+        # Desired context for the open conversation. The live model is
+        # authoritative while it exists; this seeds fresh models and survives
+        # switches made before first load.
+        self._history: list[dict] = []
 
     def _build(self, name: str) -> Model | MockModel:
         if should_mock(name):
@@ -156,6 +200,12 @@ class ModelManager:
             if self._model is not None and name == self.name:
                 return self.status_locked()
             if self._model is not None:
+                # Carry the live context over so switching tiers mid-chat
+                # keeps it. An empty live history (e.g. a mock, or a reset
+                # made before first load) leaves the recorded one alone.
+                carried = self._model.get_history()
+                if carried:
+                    self._history = carried
                 try:
                     self._model.stop()
                 except Exception:
@@ -163,6 +213,22 @@ class ModelManager:
                 self._model = None
             self.name = name
             return self.status_locked()
+
+    def set_history(self, messages: list[dict]) -> None:
+        """Point the context at an existing conversation's turns."""
+        with self._lock:
+            self._history = [
+                {"role": m["role"], "content": m["content"]}
+                for m in messages
+                if m.get("role") in ("system", "user", "assistant")
+                and isinstance(m.get("content"), str)
+            ]
+            if self._model is not None:
+                self._model.set_history(self._history)
+
+    def reset_history(self) -> None:
+        """Forget the context, e.g. on new chat."""
+        self.set_history([])
 
     def status_locked(self) -> dict:
         model = self._model
@@ -187,6 +253,7 @@ class ModelManager:
         with self._lock:
             if self._model is None:
                 self._model = self._build(self.name)
+                self._model.set_history(self._history)
             model = self._model
         # start() can block for seconds; run outside the manager lock.
         model.start()
