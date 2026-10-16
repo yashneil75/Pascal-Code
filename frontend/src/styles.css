@@ -549,99 +549,10 @@ body {
   .model-trigger svg,
   .project-trigger .caret { transition: none; }
   .msg.streaming p::after { animation: none; }
-  .sidebar { transition: none; }
 }
 
-.hamburger {
-  display: none;
-  place-items: center;
-  flex: none;
-  width: 30px;
-  height: 30px;
-  margin-right: 4px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-  color: var(--icon);
-  cursor: pointer;
-  -webkit-app-region: no-drag;
-}
-
-.hamburger svg { width: 18px; height: 18px; }
-.hamburger:hover { background: #ebe9e4; color: var(--icon-strong); }
-
-/* Snap flyout anchor: hovering the maximize button (TopBar.jsx) shows it. */
-.snap-wrap { position: relative; }
-
-.snap-popup {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: -4px;
-  z-index: 40;
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 4px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
-  -webkit-app-region: no-drag;
-}
-
-.snap-option {
-  padding: 4px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  cursor: pointer;
-}
-
-.snap-option:hover { background: #f5f4f1; }
-
-.snap-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 14px);
-  grid-template-rows: repeat(2, 10px);
-  gap: 2px;
-}
-
-.snap-grid span {
-  border-radius: 2px;
-  background: #e4e3df;
-}
-
-.snap-grid span.on { background: #6b6b68; }
-.snap-option:hover .snap-grid span.on { background: var(--icon-strong); }
-
-.scrim { display: none; }
-
-@media (max-width: 60rem) {
-  /* Narrow window: the sidebar becomes an overlay drawer instead of
-     squeezing the thread, toggled by the hamburger in the top bar. */
-  .hamburger { display: grid; }
-
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 60;
-    width: 17rem;
-    box-shadow: 8px 0 24px rgba(0, 0, 0, .12);
-    transform: translateX(-105%);
-    transition: transform .18s ease;
-  }
-
-  .sidebar.open { transform: none; }
-
-  .scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 55;
-    background: rgba(31, 31, 30, .28);
-  }
+@media (max-width: 720px) {
+  .sidebar { display: none; }
 }
 
 :focus-visible { outline: 2px solid #8a8985; outline-offset: 2px; }

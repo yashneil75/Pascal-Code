@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProjectMenu from './ProjectMenu.jsx';
-import SnapPopup from './SnapPopup.jsx';
 import { desktop } from '../api.js';
 
 export default function TopBar({
@@ -9,15 +8,11 @@ export default function TopBar({
   menuOpen,
   onToggleMenu,
   onCloseMenus,
-  onToggleSidebar,
   menu,
 }) {
   const [maximized, setMaximized] = useState(false);
-  const [snapOpen, setSnapOpen] = useState(false);
-  const hoverTimer = useRef(null);
 
   useEffect(() => desktop.onMaximized?.(setMaximized), []);
-  useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
   const toggleMaximize = async () => {
     if (!desktop.isElectron) return;
@@ -25,24 +20,8 @@ export default function TopBar({
     if (typeof next === 'boolean') setMaximized(next);
   };
 
-  // Like the native button: the snap flyout appears after a short hover.
-  const showSnap = () => {
-    if (!desktop.isElectron) return;
-    clearTimeout(hoverTimer.current);
-    hoverTimer.current = setTimeout(() => setSnapOpen(true), 300);
-  };
-  const hideSnap = () => {
-    clearTimeout(hoverTimer.current);
-    setSnapOpen(false);
-  };
-
   return (
     <header className="bar">
-      <button type="button" className="hamburger" aria-label="Toggle sidebar" onClick={onToggleSidebar}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      </button>
       <div className="project">
         <button
           type="button"
@@ -73,31 +52,22 @@ export default function TopBar({
             <path d="M7 12h10" />
           </svg>
         </button>
-        <div className="snap-wrap" onMouseEnter={showSnap} onMouseLeave={hideSnap}>
-          <button
-            type="button"
-            className="win"
-            title={maximized ? 'Restore' : 'Maximize'}
-            aria-label={`${maximized ? 'Restore' : 'Maximize'} window`}
-            aria-pressed={String(maximized)}
-            onClick={toggleMaximize}
-          >
-            <svg className="glyph-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
-              <rect x="7.25" y="7.25" width="9.5" height="9.5" rx="1.6" />
-            </svg>
-            <svg className="glyph-restore" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 7.25h5.25a1.5 1.5 0 0 1 1.5 1.5V14" />
-              <rect x="7.25" y="9.75" width="8" height="8" rx="1.6" />
-            </svg>
-          </button>
-          <SnapPopup
-            open={snapOpen}
-            onSelect={(zone) => {
-              setSnapOpen(false);
-              desktop.snap(zone);
-            }}
-          />
-        </div>
+        <button
+          type="button"
+          className="win"
+          title={maximized ? 'Restore' : 'Maximize'}
+          aria-label={`${maximized ? 'Restore' : 'Maximize'} window`}
+          aria-pressed={String(maximized)}
+          onClick={toggleMaximize}
+        >
+          <svg className="glyph-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
+            <rect x="7.25" y="7.25" width="9.5" height="9.5" rx="1.6" />
+          </svg>
+          <svg className="glyph-restore" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 7.25h5.25a1.5 1.5 0 0 1 1.5 1.5V14" />
+            <rect x="7.25" y="9.75" width="8" height="8" rx="1.6" />
+          </svg>
+        </button>
         <button type="button" className="win win-close" title="Close" aria-label="Close window" onClick={() => desktop.close()}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="m7.5 7.5 9 9" />
