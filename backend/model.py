@@ -26,15 +26,23 @@ MOCK_REPLIES = [
 ]
 
 
-def should_mock(name: str) -> bool:
+def should_mock(id: str) -> bool:
     if config.MOCK_ENV:
         return True
     if config.STRICT_ENV:
         return False
     try:
-        return not download_mod.is_downloaded(name)
+        return download_mod.resolve(id) is None
     except Exception:
         return True
+
+
+def spec_for(id: str) -> dict:
+    """Catalogue spec for a tier id; raises for anything else."""
+    if id in config.MODELS:
+        return config.MODELS[id]
+    available = ", ".join(config.MODELS)
+    raise ValueError(f"Unknown model {id!r}. Available: {available}")
 
 
 class MockModel:
@@ -64,12 +72,11 @@ class MockModel:
 
 
 class Model:
-    def __init__(self, name: str = config.DEFAULT_MODEL):
-        if name not in config.MODELS:
-            available = ", ".join(config.MODELS)
-            raise ValueError(f"Unknown model {name!r}. Available: {available}")
-        self.name = name
-        self.spec = config.MODELS[name]
+    """A real GGUF behind a catalogue tier id."""
+
+    def __init__(self, id: str = config.DEFAULT_MODEL):
+        self.name = id
+        self.spec = spec_for(id)
         self._llm = None
         self._messages: list[dict] = []
         self._lock = threading.Lock()
@@ -83,10 +90,17 @@ class Model:
             return
         from llama_cpp import Llama
 
-        model_path = download_mod.download(self.name)
+        path = download_mod.resolve(self.name)
+        if path is None:
+            if self.name in config.MODELS:
+                # Last resort: fetch the tier now (the settings popup is the
+                # progressive path; this blocks a chat until bytes arrive).
+                path = download_mod.download(self.name)
+            else:
+                raise RuntimeError(f"Model file for {self.name!r} is not on disk")
         kv_quant = self.spec["kv_quant"]
         self._llm = Llama(
-            model_path=str(model_path),
+            model_path=str(path),
             n_ctx=self.spec["ctx"],
             n_gpu_layers=-1,
             flash_attn=self.spec["flash_attn"],
@@ -129,7 +143,7 @@ class ModelManager:
         self._lock = threading.Lock()
         self.name = name
         self._model: Model | MockModel | None = None
-        self._mock_name: str | None = None
+        self._loading = False
 
     def _build(self, name: str) -> Model | MockModel:
         if should_mock(name):
@@ -137,9 +151,7 @@ class ModelManager:
         return Model(name)
 
     def select(self, name: str) -> dict:
-        if name not in config.MODELS:
-            available = ", ".join(config.MODELS)
-            raise ValueError(f"Unknown model {name!r}. Available: {available}")
+        spec_for(name)  # raises for unknown ids
         with self._lock:
             if self._model is not None and name == self.name:
                 return self.status_locked()
@@ -157,6 +169,7 @@ class ModelManager:
         return {
             "current": self.name,
             "running": bool(model is not None and model.is_running),
+            "loading": self._loading,
             "mock": isinstance(model, MockModel)
             or (model is None and should_mock(self.name)),
             "tiers": [
@@ -178,6 +191,28 @@ class ModelManager:
         # start() can block for seconds; run outside the manager lock.
         model.start()
         return model
+
+    def load_in_background(self) -> dict:
+        """Warm up the current model without blocking; see `loading` status."""
+        with self._lock:
+            if self._loading:
+                return self.status_locked()
+            if self._model is not None and self._model.is_running:
+                return self.status_locked()
+            self._loading = True
+
+        def _run() -> None:
+            try:
+                self.ensure()
+            except Exception:
+                pass
+            finally:
+                with self._lock:
+                    self._loading = False
+
+        threading.Thread(target=_run, daemon=True).start()
+        with self._lock:
+            return self.status_locked()
 
 
 manager = ModelManager()

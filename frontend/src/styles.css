@@ -136,6 +136,11 @@ body {
 .chat-delete:hover { background: #fae7e4; }
 .chat-delete svg { width: 15px; height: 15px; }
 
+/* Pinned sidebar footer: separator line, then Settings. */
+.sidebar-foot { flex: none; }
+.sidebar-foot .menu-separator { margin: 2px 0 4px; }
+.sidebar-foot .new-chat svg { width: 16px; height: 16px; }
+
 .pane {
   flex: 1;
   min-width: 0;
@@ -544,6 +549,126 @@ body {
 }
 
 .ask-actions .ask-delete:hover { background: #9c1e14; }
+
+/* Model settings popup: library rows with download/delete and progress. */
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(31, 31, 30, .28);
+}
+
+.settings-modal {
+  width: min(36rem, calc(100vw - 2rem));
+  max-height: min(82vh, 42rem);
+  overflow-y: auto;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .12);
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+
+.settings-close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--icon);
+  cursor: pointer;
+}
+
+.settings-close svg { width: 16px; height: 16px; }
+.settings-close:hover { background: #ebe9e4; color: var(--icon-strong); }
+
+.settings-sub { margin: 6px 0 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.settings-sub code { font-size: 12px; }
+
+.settings-list { display: flex; flex-direction: column; }
+
+.settings-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.settings-row:first-child { border-top: 0; }
+
+.settings-info { flex: 1; min-width: 0; }
+
+.settings-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings-state {
+  flex: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--foot);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.settings-state.is-current { color: var(--ink); border-color: #c9c8c3; }
+
+.settings-desc { margin-top: 2px; font-size: 12px; color: var(--muted); }
+
+.settings-actions { flex: none; display: flex; gap: 6px; align-items: flex-start; }
+
+.btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) { background: #f5f4f1; }
+.btn:disabled { opacity: .55; cursor: default; }
+
+.btn-danger { color: var(--danger); }
+.btn-danger:hover:not(:disabled) { background: #fae7e4; }
+
+.progress {
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--bubble);
+  overflow: hidden;
+}
+
+.progress-fill { height: 100%; background: var(--ink); transition: width .3s ease; }
+
+.progress-label { margin-top: 4px; font-size: 12px; color: var(--foot); }
+.progress-error { margin-top: 4px; font-size: 12px; color: var(--danger); }
 
 @media (prefers-reduced-motion: reduce) {
   .model-trigger svg,

@@ -1,6 +1,6 @@
-import { BIN } from './icons.jsx';
+import { BIN, SLIDERS } from './icons.jsx';
 
-export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete }) {
+export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete, onOpenSettings }) {
   const groups = new Map();
   for (const chat of chats) {
     if (!groups.has(chat.project)) groups.set(chat.project, []);
@@ -49,6 +49,13 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
           );
         })}
       </nav>
+      <div className="sidebar-foot">
+        <div className="menu-separator" />
+        <button type="button" className="new-chat" onClick={onOpenSettings}>
+          {SLIDERS}
+          Settings
+        </button>
+      </div>
     </aside>
   );
 }

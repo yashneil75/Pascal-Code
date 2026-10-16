@@ -6,7 +6,8 @@ import ModelMenu from './components/ModelMenu.jsx';
 import ChatThread from './components/ChatThread.jsx';
 import Composer from './components/Composer.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
-import { capitalize } from './components/icons.jsx';
+import SettingsPopup from './components/SettingsPopup.jsx';
+import { modelLabel } from './components/icons.jsx';
 import { api, desktop, streamChat } from './api.js';
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
   const [ask, setAsk] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState(null);
@@ -86,7 +88,10 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') closeMenus();
+      if (e.key === 'Escape') {
+        closeMenus();
+        setSettingsOpen(false);
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -258,6 +263,12 @@ export default function App() {
     }
   }, []);
 
+  // Called by the settings popup after switching; keeps the composer badge honest.
+  const handleUsed = useCallback((status) => {
+    setModel(status.current ?? '');
+    setModelMock(status.mock ?? false);
+  }, []);
+
   const projectName =
     projects.find((p) => p.path === currentProject)?.name ?? currentProject;
   const isHero = messages.length === 0 && streamingText === null;
@@ -273,6 +284,7 @@ export default function App() {
         onNew={newChat}
         onOpen={openChat}
         onDelete={deleteChat}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       <div className={`pane${isHero ? ' is-hero' : ''}`}>
@@ -332,7 +344,7 @@ export default function App() {
                   setModelOpen((v) => !v);
                 }}
               >
-                <span>{capitalize(model)}</span>
+                <span>{modelLabel(model)}</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -344,6 +356,12 @@ export default function App() {
       </div>
 
       <ConfirmDialog ask={ask} onResolve={resolveAsk} />
+      <SettingsPopup
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        confirm={confirm}
+        onUsed={handleUsed}
+      />
     </div>
   );
 }

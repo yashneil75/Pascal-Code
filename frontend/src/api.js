@@ -46,6 +46,13 @@ export const api = {
     req(`/api/settings/${key}`, { method: 'PUT', body: JSON.stringify({ value }) }),
   chat: (content) =>
     req('/api/chat', { method: 'POST', body: JSON.stringify({ content }) }),
+  library: () => req('/api/models/library'),
+  startDownload: (id) =>
+    req('/api/models/download', { method: 'POST', body: JSON.stringify({ name: id }) }),
+  downloadProgress: () => req('/api/models/download/progress'),
+  deleteModel: (id) =>
+    req(`/api/models/library/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  loadModel: () => req('/api/models/load', { method: 'POST' }),
 };
 
 /**

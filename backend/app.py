@@ -119,7 +119,8 @@ def health() -> dict:
 def get_models() -> dict:
     status = manager.status()
     return {"current": status["current"], "tiers": status["tiers"],
-            "running": status["running"], "mock": status["mock"]}
+            "running": status["running"], "loading": status["loading"],
+            "mock": status["mock"]}
 
 
 @app.post("/api/models/select")
@@ -128,6 +129,59 @@ def select_model(body: SelectModelBody) -> dict:
         return manager.select(body.name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/models/load")
+def load_model() -> dict:
+    """Warm up the current model in the background (first load is slow)."""
+    return manager.load_in_background()
+
+
+@app.get("/api/models/library")
+def get_library() -> dict:
+    """Every tier plus hand-placed GGUFs, with sizes, current, and load state."""
+    from backend import download as download_mod
+
+    status = manager.status()
+    entries = download_mod.library()
+    for entry in entries:
+        if not entry["downloaded"]:
+            entry["remote_bytes"] = download_mod.remote_size(entry["id"])
+    return {
+        "current": status["current"],
+        "running": status["running"],
+        "loading": status["loading"],
+        "mock": status["mock"],
+        "models": entries,
+    }
+
+
+@app.post("/api/models/download")
+def start_model_download(body: SelectModelBody) -> dict:
+    from backend import download as download_mod
+
+    try:
+        return download_mod.start_download(body.name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get("/api/models/download/progress")
+def download_progress() -> dict:
+    from backend import download as download_mod
+
+    return {"downloads": download_mod.download_progress()}
+
+
+@app.delete("/api/models/library/{model_id:path}")
+def delete_model(model_id: str) -> dict:
+    from backend import download as download_mod
+
+    if model_id == manager.status()["current"]:
+        raise HTTPException(status_code=400, detail="Cannot delete the active model")
+    if not download_mod.delete(model_id):
+        raise HTTPException(status_code=404, detail="Model file not found")
+    return {"deleted": model_id}
 
 
 @app.get("/api/projects")
