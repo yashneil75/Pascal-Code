@@ -10,7 +10,7 @@
  * window.electron.
  */
 
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, screen } = require('electron');
 const { spawn } = require('node:child_process');
 const path = require('node:path');
 const net = require('node:net');
@@ -85,6 +85,8 @@ function createWindow(port) {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    minWidth: 720,
+    minHeight: 540,
     frame: false, // custom title bar in React (TopBar.jsx)
     backgroundColor: '#ffffff',
     show: false, // show when ready, no white flash
@@ -125,6 +127,29 @@ ipcMain.handle('window:toggle-maximize', () => {
   return true;
 });
 ipcMain.handle('window:close', () => mainWindow?.close());
+// Custom snap layouts. Frameless windows get no native Win11 snap flyout, so
+// the renderer's SnapPopup calls this with a zone id instead.
+ipcMain.handle('window:snap', (_event, zone) => {
+  if (!mainWindow) return;
+  const ZONES = {
+    left: [0, 0, 0.5, 1],
+    right: [0.5, 0, 0.5, 1],
+    'top-left': [0, 0, 0.5, 0.5],
+    'top-right': [0.5, 0, 0.5, 0.5],
+    'bottom-left': [0, 0.5, 0.5, 0.5],
+    'bottom-right': [0.5, 0.5, 0.5, 0.5],
+  };
+  const z = ZONES[zone];
+  if (!z) return;
+  const { workArea } = screen.getDisplayMatching(mainWindow.getBounds());
+  if (mainWindow.isMaximized()) mainWindow.unmaximize();
+  mainWindow.setBounds({
+    x: Math.round(workArea.x + workArea.width * z[0]),
+    y: Math.round(workArea.y + workArea.height * z[1]),
+    width: Math.round(workArea.width * z[2]),
+    height: Math.round(workArea.height * z[3]),
+  });
+});
 ipcMain.handle('backend:port', () => backendPort);
 ipcMain.handle('dialog:open-folder', async () => {
   const res = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] });

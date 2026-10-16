@@ -1,6 +1,6 @@
 import { BIN } from './icons.jsx';
 
-export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete }) {
+export default function Sidebar({ chats, current, projectList, open, onNew, onOpen, onDelete }) {
   const groups = new Map();
   for (const chat of chats) {
     if (!groups.has(chat.project)) groups.set(chat.project, []);
@@ -9,7 +9,7 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
   const order = [...new Set([...projectList.map((p) => p.path), ...groups.keys()])];
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? ' open' : ''}`}>
       <button type="button" className="new-chat" onClick={onNew}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />

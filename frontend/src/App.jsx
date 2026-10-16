@@ -23,6 +23,7 @@ export default function App() {
   const [ask, setAsk] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState(null);
@@ -86,7 +87,10 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') closeMenus();
+      if (e.key === 'Escape') {
+        closeMenus();
+        setSidebarOpen(false);
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -133,6 +137,7 @@ export default function App() {
 
   const newChat = useCallback(async () => {
     stopStream();
+    setSidebarOpen(false);
     setMessages([]);
     setInput('');
     try {
@@ -146,6 +151,7 @@ export default function App() {
   const openChat = useCallback(
     async (id) => {
       stopStream();
+      setSidebarOpen(false);
       try {
         await api.openChat(id);
       } catch (err) {
@@ -266,10 +272,12 @@ export default function App() {
     <div className="app" onClick={(e) => {
       if (!e.target.closest('.model') && !e.target.closest('.project')) closeMenus();
     }}>
+      {sidebarOpen && <div className="scrim" onClick={() => setSidebarOpen(false)} />}
       <Sidebar
         chats={chats}
         current={currentChat}
         projectList={projects}
+        open={sidebarOpen}
         onNew={newChat}
         onOpen={openChat}
         onDelete={deleteChat}
@@ -280,6 +288,7 @@ export default function App() {
           projectName={projectName}
           projectPath={currentProject}
           menuOpen={projectOpen}
+          onToggleSidebar={() => setSidebarOpen((v) => !v)}
           onToggleMenu={() => {
             setModelOpen(false);
             setProjectOpen((v) => !v);

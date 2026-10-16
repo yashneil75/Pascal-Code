@@ -109,6 +109,7 @@ export const desktop = {
   isElectron: !!window.electron,
   minimize: () => window.electron?.minimize(),
   toggleMaximize: () => window.electron?.toggleMaximize(),
+  snap: (zone) => window.electron?.snap(zone),
   close: () => window.electron?.close(),
   onMaximized: (cb) => window.electron?.onMaximized(cb),
   openFolder: async () => {

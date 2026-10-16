@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electron', {
   getBackendPort: () => ipcRenderer.invoke('backend:port'),
   minimize: () => ipcRenderer.invoke('window:minimize'),
   toggleMaximize: () => ipcRenderer.invoke('window:toggle-maximize'),
+  snap: (zone) => ipcRenderer.invoke('window:snap', zone),
   close: () => ipcRenderer.invoke('window:close'),
   openFolder: () => ipcRenderer.invoke('dialog:open-folder'),
   onMaximized: (cb) => {
