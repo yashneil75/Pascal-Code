@@ -1,0 +1,558 @@
+/* Ported from the original single-file frontend/index.html. Class names are
+   unchanged so behaviour stays familiar; split here for maintainability. */
+
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("./assets/fonts/hanken-grotesk-variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --font: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --bg: #ffffff;
+  --ink: #1f1f1e;
+  --icon: #4b4b47;
+  --icon-strong: #1f1f1e;
+  --muted: #6b6b68;
+  --bubble: #f0f0ee;
+  --border: #e4e3df;
+  --placeholder: #8a8985;
+  --foot: #8b8a86;
+  --danger: #b42318;
+  --railed: 46rem;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 var(--font);
+}
+
+.app {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 15rem;
+  padding: 0.75rem;
+  border-right: 1px solid var(--border);
+  background: #f7f6f4;
+}
+
+.new-chat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.new-chat:hover { background: #ebe9e4; }
+.new-chat svg { flex: none; width: 16px; height: 16px; color: var(--icon); }
+
+.chats {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.group-name {
+  padding: 8px 10px 2px;
+  color: var(--foot);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.chat:hover,
+.chat:focus-within { background: #ebe9e4; }
+
+.chat[aria-current="true"] { background: #e7e5e0; }
+
+.chat-open {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px 8px 10px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* The bin stays out of sight until the row is hovered or reached by keyboard. */
+.chat-delete {
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-right: 4px;
+  padding: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--danger);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chat:hover .chat-delete,
+.chat:focus-within .chat-delete { opacity: 1; }
+
+.chat-delete:hover { background: #fae7e4; }
+.chat-delete svg { width: 15px; height: 15px; }
+
+.pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+.project { position: relative; }
+
+/* The window is frameless, so the header doubles as its title bar: the empty
+   space between the folder and the buttons is what you drag the window by. */
+.bar-drag { flex: 1; align-self: stretch; }
+.bar-drag.draggable { -webkit-app-region: drag; }
+
+.window-controls { display: flex; gap: 2px; -webkit-app-region: no-drag; }
+
+.win {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--icon);
+  cursor: pointer;
+}
+
+.win svg { width: 16px; height: 16px; }
+.win:hover { background: #ebe9e4; color: var(--icon-strong); }
+.win-close:hover { background: var(--danger); color: #fff; }
+
+.win .glyph-restore { display: none; }
+.win[aria-pressed="true"] .glyph-max { display: none; }
+.win[aria-pressed="true"] .glyph-restore { display: block; }
+
+.project-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 22rem;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.project-trigger[hidden] { display: none; }
+.project-trigger:hover { background: #f5f4f1; }
+
+#project-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-trigger .folder { flex: none; width: 16px; height: 16px; color: var(--icon); }
+.project-trigger .caret { flex: none; width: 12px; height: 12px; color: var(--muted); transition: transform .15s ease; }
+.project-trigger[aria-expanded="true"] .caret { transform: rotate(180deg); }
+
+.thread,
+.dock {
+  width: 100%;
+  max-width: var(--railed);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-block: 2rem;
+}
+
+/* Empty state: no messages yet, so the input sits in the middle of the pane. */
+.pane.is-hero .dock { margin-block: auto; }
+.pane.is-hero .thread { display: none; }
+
+.hero {
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.pane:not(.is-hero) .hero { display: none; }
+
+.msg { max-width: 100%; }
+
+.msg p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.msg.user {
+  align-self: flex-end;
+  max-width: 80%;
+  background: var(--bubble);
+  border-radius: 12px;
+  padding: 8px 14px;
+}
+
+.msg.streaming p::after {
+  content: "▍";
+  color: var(--muted);
+  animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.error-bubble {
+  align-self: stretch;
+  background: #fae7e4;
+  color: var(--danger);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+  margin: 6px 0 0 -5px;
+}
+
+.actions button,
+.composer button {
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.actions button:hover { background: #f5f4f1; color: var(--icon-strong); }
+
+.actions svg { width: 16px; height: 16px; }
+
+.actions .icon-check { display: none; }
+.actions button[data-copied] .icon-copy { display: none; }
+.actions button[data-copied] .icon-check { display: block; color: var(--icon-strong); }
+
+.dock { padding-bottom: 1.5rem; }
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.composer:focus-within { border-color: #c9c8c3; }
+
+.composer button { color: var(--icon); }
+.composer button:hover { background: #f5f4f1; color: var(--icon-strong); }
+.composer svg { width: 18px; height: 18px; }
+
+.composer .send {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+
+.composer .send:hover { background: #000; }
+
+.composer .send:disabled {
+  background: #ebeae6;
+  color: #a8a7a2;
+  cursor: default;
+}
+
+.composer .send:disabled:hover { background: #ebeae6; }
+
+.composer .stop {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #8a8986;
+}
+
+.composer .stop:hover { background: #f5f4f1; }
+.composer .stop svg { width: 20px; height: 20px; }
+
+.composer button[hidden] { display: none; }
+
+.composer textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 10rem;
+  padding: 6px 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow-y: auto;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.composer textarea::placeholder { color: var(--placeholder); }
+
+.meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 10px 2px 0;
+  font-size: 12px;
+  color: var(--foot);
+}
+
+.mock-badge {
+  padding: 2px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+}
+
+.model { position: relative; }
+
+.model-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: -3px -6px;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #4a4a46;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.model-trigger[hidden] { display: none; }
+.model-trigger:hover { background: #f5f4f1; }
+.model-trigger svg { width: 12px; height: 12px; transition: transform .15s ease; }
+.model-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.model-menu {
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 20rem;
+  max-width: min(24rem, calc(100vw - 2rem));
+}
+
+.project-menu {
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 17rem;
+  max-width: min(24rem, calc(100vw - 2rem));
+}
+
+.menu {
+  position: absolute;
+  z-index: 20;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
+
+.menu-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-option:hover { background: #f5f4f1; }
+
+.menu-option .opt-text { flex: 1; min-width: 0; }
+.menu-option .opt-name { display: block; font-size: 13px; }
+.menu-option .opt-desc { display: block; margin-top: 2px; font-size: 12px; color: var(--foot); }
+
+/* A folder path, which is usually longer than the menu is wide. */
+.menu-option .opt-path {
+  display: block;
+  margin-top: 2px;
+  color: var(--foot);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-option .check { flex: none; width: 15px; height: 15px; opacity: 0; }
+.menu-option[aria-checked="true"] .check { opacity: 1; }
+
+.menu-option .opt-icon { flex: none; width: 15px; height: 15px; color: var(--muted); }
+
+.menu-separator { height: 1px; margin: 6px; background: var(--border); }
+
+/* A folder row is an option button with the bin laid over its right edge, so
+   the two never sit inside each other. */
+.menu-row { position: relative; display: flex; }
+.menu-row .menu-option { flex: 1; }
+.menu-row:hover .menu-option .check { opacity: 0; }
+
+.menu-delete {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--danger);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.menu-row:hover .menu-delete,
+.menu-delete:focus-visible { opacity: 1; }
+
+.menu-delete:hover { background: #fae7e4; }
+.menu-delete svg { width: 15px; height: 15px; }
+
+/* Confirmation dialog, shared by deleting a chat and deleting a project. */
+.ask {
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .12);
+}
+
+.ask::backdrop { background: rgba(31, 31, 30, .28); }
+
+.ask h2 { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
+.ask p { margin: 0 0 14px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+
+.ask-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.ask-opt input { width: 15px; height: 15px; accent-color: var(--ink); cursor: pointer; }
+
+.ask-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+.ask-actions button {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ask-actions button:hover { background: #f5f4f1; }
+
+.ask-actions .ask-delete {
+  border-color: transparent;
+  background: var(--danger);
+  color: #fff;
+}
+
+.ask-actions .ask-delete:hover { background: #9c1e14; }
+
+@media (prefers-reduced-motion: reduce) {
+  .model-trigger svg,
+  .project-trigger .caret { transition: none; }
+  .msg.streaming p::after { animation: none; }
+}
+
+@media (max-width: 720px) {
+  .sidebar { display: none; }
+}
+
+:focus-visible { outline: 2px solid #8a8985; outline-offset: 2px; }
