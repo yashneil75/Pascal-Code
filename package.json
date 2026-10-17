@@ -66,8 +66,6 @@
       "allowToChangeInstallationDirectory": true,
       "shortcutName": "Pascal Code"
     },
-    "portable": {
-      "artifactName": "Pascal-Code-${version}-portable.exe"
-    }
+    "portable": {}
   }
 }
