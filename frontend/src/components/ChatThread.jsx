@@ -2,6 +2,18 @@ import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+function splitThinking(content) {
+  const m = content.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
+  const thinking = m ? m[1].trim() : '';
+  const answer = content.replace(/<think>[\s\S]*?(?:<\/think>|$)/, '').trim();
+  const done = content.includes('</think>');
+  return { thinking, answer, done };
+}
+
+function Spinner() {
+  return <span className="spinner" aria-label="Thinking" />;
+}
+
 function Message({ role, content, streaming }) {
   const copyBtn = useRef(null);
 
@@ -17,14 +29,31 @@ function Message({ role, content, streaming }) {
     }
   };
 
+  if (role === 'user') {
+    return (
+      <div className={`msg ${role}`}>
+        <p>{content}</p>
+      </div>
+    );
+  }
+
+  const { thinking, answer, done } = splitThinking(content);
+  const showSpinner = streaming;
+
   return (
     <div className={`msg ${role}${streaming ? ' streaming' : ''}`}>
-      {role === 'assistant' ? (
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-      ) : (
-        <p>{content}</p>
+      {thinking && (
+        <details className="thinking" open>
+          <summary>
+            Thinking
+            {showSpinner && !done && <Spinner />}
+          </summary>
+          <div className="thinking-box">{thinking}</div>
+        </details>
       )}
-      {role === 'assistant' && !streaming && content && (
+      {answer && <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>}
+      {showSpinner && <div className="stream-spinner"><Spinner /></div>}
+      {!streaming && content && (
         <div className="actions">
           <button ref={copyBtn} type="button" data-copy aria-label="Copy" onClick={copy}>
             <svg className="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

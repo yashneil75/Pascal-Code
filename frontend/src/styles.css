@@ -294,10 +294,65 @@ body {
 .msg pre { background: var(--bubble); padding: 0.75rem; border-radius: 8px; overflow-x: auto; margin: 0.5rem 0; }
 .msg pre code { background: none; padding: 0; }
 
-.msg.streaming p::after {
-  content: "▍";
+.thinking {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: var(--bubble);
+}
+
+.thinking summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--muted);
-  animation: blink 1s steps(2) infinite;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.thinking-box {
+  margin-top: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+  scrollbar-color: #1f7f95 transparent;
+}
+
+.thinking-box::-webkit-scrollbar { width: 8px; }
+.thinking-box::-webkit-scrollbar-thumb { background: #1f7f95; border-radius: 999px; }
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(31, 127, 149, 0.25);
+  border-top-color: #1f7f95;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stream-spinner {
+  margin-top: 6px;
+}
+
+.thread::-webkit-scrollbar {
+  width: 10px;
+}
+
+.thread::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thread::-webkit-scrollbar-thumb {
+  background: #1f7f95;
+  border-radius: 999px;
 }
 
 @keyframes blink { 50% { opacity: 0; } }
@@ -358,7 +413,7 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--ink);
+  background: #1f7f95;
   color: #fff;
 }
 
