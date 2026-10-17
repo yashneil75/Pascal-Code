@@ -3,11 +3,21 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 function splitThinking(content) {
-  const m = content.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
-  const thinking = m ? m[1].trim() : '';
-  const answer = content.replace(/<think>[\s\S]*?(?:<\/think>|$)/, '').trim();
-  const done = content.includes('</think>');
-  return { thinking, answer, done };
+  const closeIdx = content.indexOf('</think>');
+  if (closeIdx !== -1) {
+    // Models may emit only the closing tag; treat everything before it as
+    // reasoning (dropping a leading <think> if present).
+    const thinking = content.slice(0, closeIdx).replace(/<think>/g, '').trim();
+    const answer = content.slice(closeIdx + '</think>'.length).trim();
+    return { thinking, answer, done: true };
+  }
+  const openIdx = content.indexOf('<think>');
+  if (openIdx !== -1) {
+    const thinking = content.slice(openIdx + '<think>'.length).trim();
+    const answer = content.slice(0, openIdx).trim();
+    return { thinking, answer, done: false };
+  }
+  return { thinking: '', answer: content.trim(), done: false };
 }
 
 function Spinner() {
