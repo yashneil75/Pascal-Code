@@ -48,6 +48,18 @@
         "nsis"
       ]
     },
+    "mac": {
+      "icon": "Logo.png",
+      "target": [
+        "dmg"
+      ]
+    },
+    "linux": {
+      "icon": "Logo.png",
+      "target": [
+        "AppImage"
+      ]
+    },
     "icon": "Logo.png",
     "nsis": {
       "oneClick": false,
