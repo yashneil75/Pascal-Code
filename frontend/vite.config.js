@@ -11,6 +11,7 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
+    fs: { allow: ['..'] },
     proxy: {
       '/api': {
         target: process.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000',

@@ -82,10 +82,6 @@ export default function SettingsPopup({ open, onClose, confirm, onUsed }) {
             </svg>
           </button>
         </div>
-        <p className="settings-sub">
-          Weights live in <code>~/.pascal_code</code>. Download a tier, warm it up, or delete what you
-          don&rsquo;t need.
-        </p>
         <div className="settings-list">
           {!lib && <p className="settings-sub">Loading…</p>}
           {lib?.models.map((m) => {

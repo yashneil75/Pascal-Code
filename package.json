@@ -32,7 +32,8 @@
     "files": [
       "electron/",
       "frontend/dist/",
-      "package.json"
+      "package.json",
+      "Logo.png"
     ],
     "extraResources": [
       {
@@ -41,11 +42,13 @@
       }
     ],
     "win": {
+      "icon": "Logo.png",
       "target": [
         "portable",
         "nsis"
       ]
     },
+    "icon": "Logo.png",
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,

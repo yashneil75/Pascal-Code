@@ -87,6 +87,7 @@ function createWindow(port) {
     height: 800,
     frame: false, // custom title bar in React (TopBar.jsx)
     backgroundColor: '#ffffff',
+    icon: path.join(__dirname, '..', 'Logo.png'),
     show: false, // show when ready, no white flash
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),

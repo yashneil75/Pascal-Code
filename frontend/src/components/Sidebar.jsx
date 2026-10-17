@@ -1,4 +1,5 @@
 import { BIN, SLIDERS } from './icons.jsx';
+import logo from '../../../Logo.png';
 
 export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete, onOpenSettings }) {
   const groups = new Map();
@@ -10,6 +11,10 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
 
   return (
     <aside className="sidebar">
+      <div className="sidebar-brand">
+        <img src={logo} alt="Pascal Code" className="sidebar-logo" />
+        <span className="sidebar-title">Pascal Code</span>
+      </div>
       <button type="button" className="new-chat" onClick={onNew}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
