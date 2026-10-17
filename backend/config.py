@@ -42,10 +42,10 @@ MODELS = {
         "repo": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
         "file": "Qwen3.8-27B-GSQ-RCO-IQ2_S-mtp.gguf",
         "temp": 0.7,
-        "ctx": 200000,
+        "ctx": 100000,
         "kv_quant": llama_cpp.GGML_TYPE_Q4_0,
         "flash_attn": True,
-        "description": "200K ctx • 12GB VRAM or 16GB RAM",
+        "description": "100K ctx • 12GB VRAM or 16GB RAM",
     },
     "pro": {
         "repo": "unsloth/Qwen3.8-27B-GGUF",
