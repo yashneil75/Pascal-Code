@@ -287,6 +287,13 @@ body {
   padding: 8px 14px;
 }
 
+.msg :first-child { margin-top: 0; }
+.msg :last-child { margin-bottom: 0; }
+.msg ul, .msg ol { margin: 0.5rem 0; padding-left: 1.25rem; }
+.msg code { background: var(--bubble); padding: 2px 4px; border-radius: 4px; font-size: 0.9em; }
+.msg pre { background: var(--bubble); padding: 0.75rem; border-radius: 8px; overflow-x: auto; margin: 0.5rem 0; }
+.msg pre code { background: none; padding: 0; }
+
 .msg.streaming p::after {
   content: "▍";
   color: var(--muted);
@@ -452,7 +459,7 @@ body {
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--bg);
+  background: #fff6ea;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
 }
 
@@ -592,7 +599,7 @@ body {
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: var(--bg);
+  background: #fff6ea;
   color: var(--ink);
   box-shadow: 0 16px 40px rgba(0, 0, 0, .12);
 }

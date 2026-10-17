@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function Message({ role, content, streaming }) {
   const copyBtn = useRef(null);
@@ -17,7 +19,11 @@ function Message({ role, content, streaming }) {
 
   return (
     <div className={`msg ${role}${streaming ? ' streaming' : ''}`}>
-      <p>{content}</p>
+      {role === 'assistant' ? (
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      ) : (
+        <p>{content}</p>
+      )}
       {role === 'assistant' && !streaming && content && (
         <div className="actions">
           <button ref={copyBtn} type="button" data-copy aria-label="Copy" onClick={copy}>
