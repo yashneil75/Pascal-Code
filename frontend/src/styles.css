@@ -89,8 +89,8 @@ body {
   cursor: pointer;
 }
 
-.new-chat:hover { background: #ebe9e4; }
-.new-chat svg { flex: none; width: 16px; height: 16px; color: var(--icon); }
+.new-chat:hover { background: transparent; }
+.new-chat svg { flex: none; width: 16px; height: 16px; color: inherit; }
 
 .chats {
   flex: 1;
@@ -103,7 +103,7 @@ body {
 
 .group-name {
   padding: 8px 10px 2px;
-  color: var(--foot);
+  color: #ffffff;
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -118,9 +118,9 @@ body {
 }
 
 .chat:hover,
-.chat:focus-within { background: #ebe9e4; }
+.chat:focus-within { background: transparent; }
 
-.chat[aria-current="true"] { background: #e7e5e0; }
+.chat[aria-current="true"] { background: rgba(255, 255, 255, 0.18); }
 
 .chat-open {
   flex: 1;
