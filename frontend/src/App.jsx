@@ -63,6 +63,14 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // Resolve the backend port (Electron exposes it synchronously via
+      // preload, but fall back to the async IPC channel just in case).
+      if (typeof window !== 'undefined' && window.electron && !window.electron.backendPort && typeof window.electron.getBackendPort === 'function') {
+        try {
+          const p = await window.electron.getBackendPort();
+          if (p) window.__BACKEND_PORT = p;
+        } catch {}
+      }
       for (let i = 0; i < 60 && !cancelled; i++) {
         try {
           await api.health();
