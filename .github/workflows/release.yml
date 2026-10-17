@@ -15,23 +15,23 @@ jobs:
         include:
           - os: windows-latest
             artifact: windows-cuda
-            extra_index: https://abetlen.github.io/llama-cpp-python/whl/cu124
+            llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
             builder_args: --win portable
           - os: windows-latest
             artifact: windows-vulkan
-            extra_index: https://abetlen.github.io/llama-cpp-python/whl/vulkan
+            llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/vulkan
             builder_args: --win portable
           - os: macos-latest
             artifact: macos-metal
-            extra_index: https://abetlen.github.io/llama-cpp-python/whl/metal
+            llama_install: pip install cmake && CMAKE_ARGS="-DGGML_METAL=on" pip install --no-cache-dir --no-binary llama-cpp-python llama-cpp-python
             builder_args: --mac dmg
           - os: ubuntu-latest
             artifact: linux-cuda
-            extra_index: https://abetlen.github.io/llama-cpp-python/whl/cu124
+            llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
             builder_args: --linux AppImage
           - os: ubuntu-latest
             artifact: linux-vulkan
-            extra_index: https://abetlen.github.io/llama-cpp-python/whl/vulkan
+            llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/vulkan
             builder_args: --linux AppImage
 
     steps:
@@ -55,7 +55,7 @@ jobs:
           python -m pip install --upgrade pip
           grep -v "llama-cpp-python" backend/requirements.txt > /tmp/req.txt
           pip install --no-cache-dir --retries 5 -r /tmp/req.txt
-          pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url ${{ matrix.extra_index }}
+          ${{ matrix.llama_install }}
           pip install --no-cache-dir --retries 5 pyinstaller
 
       - name: Install Node dependencies
