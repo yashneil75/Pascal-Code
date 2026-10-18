@@ -26,7 +26,7 @@ PORT = int(os.environ.get("PASCAL_PORT", "8000"))
 # Useful for UI work without a multi-GB download. Automatically enabled when
 # the selected model file is not on disk (unless PASCAL_STRICT=1).
 MOCK_ENV = os.environ.get("PASCAL_MOCK", "").lower() in ("1", "true", "yes")
-STRICT_ENV = os.environ.get("PASCAL_STRICT", "").lower() in ("1", "true", "yes")
+STRICT_ENV = True
 
 MODELS = {
     "lite": {

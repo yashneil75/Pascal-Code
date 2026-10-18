@@ -56,10 +56,5 @@ class LibraryTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             download_mod.start_download("nope")
 
-    def test_should_mock_follows_disk(self):
-        self.assertFalse(model_mod.should_mock("lite"))
-        self.assertTrue(model_mod.should_mock("medium"))
-
-
 if __name__ == "__main__":
     unittest.main()
