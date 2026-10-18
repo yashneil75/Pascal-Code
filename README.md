@@ -15,9 +15,7 @@ Pascal-Code-Desktop/
   release/          Installer + portable exe (build artifact, not in git)
 ```
 
-## The real desktop app (installer / portable exe)
-
-No browser, no localhost tabs. One command builds everything:
+## The desktop app (installer / portable exe)
 
 ```
 npm run dist
@@ -46,15 +44,10 @@ packaged runs.
 
 ## Dev (browser-free too)
 
-`npm run dev` opens the Electron window, not a browser tab: it starts the
+`npm run dev` opens the Electron window: it starts the
 Python backend, the Vite server, then Electron pointed at Vite. The
 `frontend:dev` script alone is the only thing that serves localhost for
 plain-browser debugging.
-
-Real model replies: download weights once (`python -m backend.download lite`),
-then run without `PASCAL_MOCK`. Without weights (or with `PASCAL_MOCK=1`) the
-backend streams the same canned replies the old frontend used, and the UI
-shows a "mock model" badge.
 
 ## API
 
@@ -68,14 +61,3 @@ shows a "mock model" badge.
 Folder picking lives in Electron (`dialog:open-folder`); the Python
 `browse()` from the pywebview days is gone. Window controls go through the
 preload bridge (`window.electron`), and the drag region uses `-webkit-app-region`.
-
-## Notes vs the old app
-
-- `ui.py` Api methods map 1:1 to REST endpoints; the write-ordering queue the
-  old JS kept is unnecessary now — the backend persists user/assistant turns.
-- Streaming pause/resume became Stop (abort): a real LLM cannot resume a
-  cancelled generation, so the button aborts the SSE fetch instead.
-- Model switching now hits the backend (`POST /api/models/select`); the old
-  picker only changed a label.
-- `frontend/index.html` single-file build was split into `App.jsx` +
-  `components/` + `hooks/` + `styles.css` with identical class names.
