@@ -17,12 +17,12 @@ jobs:
             artifact: windows-cuda
             ext: .exe
             llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
-            builder_args: --win portable
+            builder_args: --win nsis
           - os: windows-latest
             artifact: windows-vulkan
             ext: .exe
             llama_install: pip install --no-cache-dir --retries 5 llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/vulkan
-            builder_args: --win portable
+            builder_args: --win nsis
           - os: macos-latest
             artifact: macos-metal
             ext: .dmg
