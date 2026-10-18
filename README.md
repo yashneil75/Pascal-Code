@@ -42,7 +42,7 @@ python -m backend.download lite
 Weights and chats live in `%USERPROFILE%\.pascal_code`, shared by dev and
 packaged runs.
 
-## Dev (browser-free too)
+## Dev
 
 `npm run dev` opens the Electron window: it starts the
 Python backend, the Vite server, then Electron pointed at Vite. The
