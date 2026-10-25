@@ -26,7 +26,7 @@ PORT = int(os.environ.get("PASCAL_PORT", "8000"))
 # Useful for UI work without a multi-GB download. Automatically enabled when
 # the selected model file is not on disk (unless PASCAL_STRICT=1).
 MOCK_ENV = os.environ.get("PASCAL_MOCK", "").lower() in ("1", "true", "yes")
-STRICT_ENV = True
+STRICT_ENV = True # no longer used so just set to True(no canned responses), but kept for backwards compatibility with old env vars
 
 MODELS = {
     "lite": {
@@ -36,34 +36,25 @@ MODELS = {
         "ctx": 100000,
         "kv_quant": llama_cpp.GGML_TYPE_Q4_0,
         "flash_attn": True,
-        "description": "100K ctx • 8GB VRAM or 12GB RAM",
+        "description": "100K ctx • 8GB VRAM or 12GB RAM • Fastest for general work",
     },
     "medium": {
-        "repo": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "file": "Qwen3.8-27B-GSQ-RCO-IQ2_S-mtp.gguf",
+        "repo": "ConwayResearch/Underdog-Saluki-27B-1.0",
+        "file": "Underdog-Saluki-27B-1.0-IQ2-mix.gguff",
         "temp": 0.7,
         "ctx": 100000,
         "kv_quant": llama_cpp.GGML_TYPE_Q4_0,
         "flash_attn": True,
-        "description": "100K ctx • 12GB VRAM or 16GB RAM",
+        "description": "100K ctx • 12GB VRAM or 16GB RAM • Strong performance for demanding tasks",
     },
     "pro": {
-        "repo": "unsloth/Qwen3.8-27B-GGUF",
-        "file": "Qwen3.8-27B-UD-IQ3_XXS.gguf",
+        "repo": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
+        "file": "Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf",
         "temp": 0.7,
         "ctx": 200000,
         "kv_quant": llama_cpp.GGML_TYPE_Q8_0,
         "flash_attn": True,
-        "description": "200K ctx • At least 16GB VRAM or 20GB RAM",
-    },
-    "pro+": {
-        "repo": "unsloth/Qwen3.8-27B-GGUF",
-        "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
-        "temp": 0.7,
-        "ctx": 512000,
-        "kv_quant": llama_cpp.GGML_TYPE_Q8_0,
-        "flash_attn": True,
-        "description": "512K ctx • At least 24GB VRAM or 28GB RAM",
+        "description": "200K ctx • At least 16GB VRAM or 20GB RAM • Highest performance for the most demanding tasks",
     },
 }
 

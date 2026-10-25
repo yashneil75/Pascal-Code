@@ -169,7 +169,7 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: #fff6ea;
+  background: #ffffff;
 }
 
 .bar {
@@ -514,7 +514,7 @@ body {
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff6ea;
+  background: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
 }
 
@@ -654,7 +654,7 @@ body {
   padding: 1.25rem;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #fff6ea;
+  background: #ffffff;
   color: var(--ink);
   box-shadow: 0 16px 40px rgba(0, 0, 0, .12);
 }
