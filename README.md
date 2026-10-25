@@ -1,4 +1,4 @@
-# Pascal Code Desktop — React + Python hybrid
+# Pascal Code Desktop
 
 Desktop chat app. React (Vite) frontend, Python (FastAPI + llama.cpp) backend,
 Electron frameless shell.
