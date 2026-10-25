@@ -47,7 +47,7 @@ body {
   width: 15rem;
   padding: 0.75rem;
   border-right: 1px solid var(--border);
-  background: #1f7f95;
+  background: #6b6b68;
   color: #ffffff;
 }
 
@@ -320,11 +320,11 @@ body {
   color: var(--muted);
   white-space: pre-wrap;
   scrollbar-width: thin;
-  scrollbar-color: #1f7f95 transparent;
+  scrollbar-color: #c9c8c3 transparent;
 }
 
 .thinking-box::-webkit-scrollbar { width: 8px; }
-.thinking-box::-webkit-scrollbar-thumb { background: #1f7f95; border-radius: 999px; }
+.thinking-box::-webkit-scrollbar-thumb { background: #c9c8c3; border-radius: 999px; }
 
 .spinner {
   display: inline-block;
@@ -351,7 +351,7 @@ body {
 }
 
 .thread::-webkit-scrollbar-thumb {
-  background: #1f7f95;
+  background: #c9c8c3;
   border-radius: 999px;
 }
 
