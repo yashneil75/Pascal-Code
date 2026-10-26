@@ -11,6 +11,7 @@
  */
 
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { spawn } = require('node:child_process');
 const path = require('node:path');
 const net = require('node:net');
@@ -152,6 +153,11 @@ app.whenReady().then(async () => {
   }
   process.env.PASCAL_PORT = String(backendPort);
   createWindow(backendPort);
+
+  // Auto-update from GitHub Releases (published by the release workflow).
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.checkForUpdatesAndNotify().catch((err) => console.error('update check failed:', err));
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow(backendPort);

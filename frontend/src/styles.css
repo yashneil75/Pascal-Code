@@ -330,8 +330,8 @@ body {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(31, 127, 149, 0.25);
-  border-top-color: #1f7f95;
+  border: 2px solid rgba(107, 107, 104, 0.25);
+  border-top-color: #6b6b68;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -413,7 +413,7 @@ body {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #1f7f95;
+  background: #6b6b68;
   color: #fff;
 }
 
@@ -686,6 +686,26 @@ body {
 .settings-sub code { font-size: 12px; }
 
 .settings-list { display: flex; flex-direction: column; }
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.settings-table th,
+.settings-table td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.settings-table th {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.settings-table tr.is-current { background: #f5f4f1; }
+.settings-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .settings-row {
   display: flex;

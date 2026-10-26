@@ -25,6 +25,11 @@
     "wait-on": "^8.0.0"
   },
   "build": {
+    "publish": {
+      "provider": "github",
+      "owner": "yashneil75",
+      "repo": "Pascal-Code"
+    },
     "appId": "com.pascalcode.desktop",
     "productName": "Pascal Code",
     "directories": {
@@ -68,5 +73,8 @@
       "shortcutName": "Pascal Code"
     },
     "portable": {}
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
   }
 }
