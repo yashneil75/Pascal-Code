@@ -47,7 +47,7 @@ body {
   width: 15rem;
   padding: 0.75rem;
   border-right: 1px solid var(--border);
-  background: #6b6b68;
+  background: #1f1f1e;
   color: #ffffff;
 }
 
@@ -691,6 +691,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
 }
 .settings-table th,
 .settings-table td {
@@ -698,7 +699,12 @@ body {
   padding: 8px 6px;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
+  overflow: hidden;
 }
+.settings-table th:nth-child(1) { width: 40%; }
+.settings-table th:nth-child(2) { width: 15%; }
+.settings-table th:nth-child(3) { width: 15%; }
+.settings-table th:nth-child(4) { width: 30%; }
 .settings-table th {
   font-size: 12px;
   color: var(--muted);
@@ -706,6 +712,7 @@ body {
 }
 .settings-table tr.is-current { background: #f5f4f1; }
 .settings-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.settings-table .settings-desc { font-size: 12px; color: var(--muted); }
 
 .settings-row {
   display: flex;
