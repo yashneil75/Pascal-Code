@@ -691,19 +691,18 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  table-layout: fixed;
+  table-layout: auto;
 }
 .settings-table th,
 .settings-table td {
   text-align: left;
-  padding: 8px 6px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
-  overflow: hidden;
 }
-.settings-table th:nth-child(1) { width: 40%; }
-.settings-table th:nth-child(2) { width: 15%; }
-.settings-table th:nth-child(3) { width: 15%; }
+.settings-table th:nth-child(1) { width: 38%; }
+.settings-table th:nth-child(2) { width: 16%; white-space: nowrap; }
+.settings-table th:nth-child(3) { width: 16%; white-space: nowrap; }
 .settings-table th:nth-child(4) { width: 30%; }
 .settings-table th {
   font-size: 12px;
@@ -711,8 +710,11 @@ body {
   font-weight: 600;
 }
 .settings-table tr.is-current { background: #f5f4f1; }
-.settings-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .settings-table .settings-desc { font-size: 12px; color: var(--muted); }
+.settings-table .settings-name { font-weight: 600; }
+.settings-table .progress { width: 100%; }
+.settings-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.settings-actions .btn { font-size: 12px; padding: 4px 8px; }
 
 .settings-row {
   display: flex;
