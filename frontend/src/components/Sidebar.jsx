@@ -1,4 +1,4 @@
-import { BIN, SLIDERS } from './icons.jsx';
+import { BIN, PEN, GEAR, FOLDER } from './icons.jsx';
 import logo from '../../../Logo.png';
 
 export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete, onOpenSettings }) {
@@ -16,9 +16,7 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
         <span className="sidebar-title">Pascal Code</span>
       </div>
       <button type="button" className="new-chat" onClick={onNew}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+        {PEN}
         New chat
       </button>
       <nav className="chats" aria-label="Chats">
@@ -28,7 +26,8 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
           return (
             <div key={path}>
               <div className="group-name" title={path}>
-                {name}
+                {FOLDER}
+                <span className="group-title">{name}</span>
               </div>
               {groups.get(path).map(({ id, title }) => (
                 <div key={id} className="chat" aria-current={String(id === current)}>
@@ -57,7 +56,7 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
       <div className="sidebar-foot">
         <div className="menu-separator" />
         <button type="button" className="new-chat" onClick={onOpenSettings}>
-          {SLIDERS}
+          {GEAR}
           Settings
         </button>
       </div>

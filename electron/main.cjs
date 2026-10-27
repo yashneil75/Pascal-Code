@@ -87,7 +87,7 @@ function createWindow(port) {
     width: 1280,
     height: 800,
     frame: false, // custom title bar in React (TopBar.jsx)
-    backgroundColor: '#ffffff',
+    backgroundColor: '#1c1c1c',
     icon: path.join(__dirname, '..', 'Logo.png'),
     show: false, // show when ready, no white flash
     webPreferences: {
