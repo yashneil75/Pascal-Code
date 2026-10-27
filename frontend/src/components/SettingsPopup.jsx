@@ -82,87 +82,77 @@ export default function SettingsPopup({ open, onClose, confirm, onUsed }) {
             </svg>
           </button>
         </div>
-        <table className="settings-table">
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th>Status</th>
-              <th>Size</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!lib && (
-              <tr><td colSpan="4" className="settings-sub">Loading…</td></tr>
-            )}
-            {lib?.models.map((m) => {
-              const isCurrent = m.id === lib.current;
-              const dl = progress[m.id];
-              const downloading = dl?.status === 'downloading' || dl?.status === 'queued';
-              const failed = dl?.status === 'error';
-              const p = pct(dl);
-              const size = fmtSize(m.size_bytes ?? m.remote_bytes);
-              const state = isCurrent
-                ? lib.running
-                  ? 'Active'
-                  : lib.loading
-                    ? 'Loading…'
-                    : 'Selected'
-                : m.downloaded
-                  ? 'Downloaded'
-                  : 'Not downloaded';
-              return (
-                <tr key={m.id} className={isCurrent ? 'is-current' : ''}>
-                  <td>
-                    <div className="settings-name">{capitalize(m.label)}</div>
-                    <div className="settings-desc">{m.description}</div>
-                    {downloading && (
-                      <>
-                        <div className="progress" role="progressbar" aria-valuenow={p ?? 0} aria-valuemin="0" aria-valuemax="100">
-                          <div className="progress-fill" style={{ width: `${p ?? 0}%` }} />
-                        </div>
-                        <div className="progress-label">
-                          {failed || p == null ? 'Starting…' : `${p}% · ${fmtSize(dl.downloaded)} of ${fmtSize(dl.total)}`}
-                        </div>
-                      </>
-                    )}
-                    {failed && <div className="progress-error">{dl.error || 'Download failed'}</div>}
-                  </td>
-                  <td><span className={`settings-state${isCurrent ? ' is-current' : ''}`}>{state}</span></td>
-                  <td>{size}</td>
-                  <td className="settings-actions">
-                    {!m.downloaded && !downloading && (
-                      <button type="button" className="btn" disabled={busy === m.id}
-                        onClick={() => run(m.id, () => api.startDownload(m.id))}>
-                        Download
+        <div className="settings-list" role="list">
+          {!lib && <div className="settings-sub">Loading…</div>}
+          {lib?.models.map((m) => {
+            const isCurrent = m.id === lib.current;
+            const dl = progress[m.id];
+            const downloading = dl?.status === 'downloading' || dl?.status === 'queued';
+            const failed = dl?.status === 'error';
+            const p = pct(dl);
+            const size = fmtSize(m.size_bytes ?? m.remote_bytes);
+            const state = isCurrent
+              ? lib.running
+                ? 'Active'
+                : lib.loading
+                  ? 'Loading…'
+                  : 'Selected'
+              : m.downloaded
+                ? 'Downloaded'
+                : 'Not downloaded';
+            return (
+              <div key={m.id} className={`settings-row${isCurrent ? ' is-current' : ''}`} role="listitem">
+                <div className="settings-info">
+                  <div className="settings-name">{capitalize(m.label)}</div>
+                  <div className="settings-desc">{m.description}</div>
+                  {downloading && (
+                    <>
+                      <div className="progress" role="progressbar" aria-valuenow={p ?? 0} aria-valuemin="0" aria-valuemax="100">
+                        <div className="progress-fill" style={{ width: `${p ?? 0}%` }} />
+                      </div>
+                      <div className="progress-label">
+                        {failed || p == null ? 'Starting…' : `${p}% · ${fmtSize(dl.downloaded)} of ${fmtSize(dl.total)}`}
+                      </div>
+                    </>
+                  )}
+                  {failed && <div className="progress-error">{dl.error || 'Download failed'}</div>}
+                </div>
+                <div className="settings-meta">
+                  <span className={`settings-state${isCurrent ? ' is-current' : ''}`}>{state}</span>
+                  <span className="settings-size">{size}</span>
+                </div>
+                <div className="settings-actions">
+                  {!m.downloaded && !downloading && (
+                    <button type="button" className="btn" disabled={busy === m.id}
+                      onClick={() => run(m.id, () => api.startDownload(m.id))}>
+                      Download
+                    </button>
+                  )}
+                  {m.downloaded && !isCurrent && (
+                    <>
+                      <button type="button" className="btn" disabled={busy === m.id} onClick={() => useModel(m.id)}>
+                        Use
                       </button>
-                    )}
-                    {m.downloaded && !isCurrent && (
-                      <>
-                        <button type="button" className="btn" disabled={busy === m.id} onClick={() => useModel(m.id)}>
-                          Use
-                        </button>
-                        <button type="button" className="btn btn-danger" disabled={busy === m.id}
-                          onClick={() => deleteModel(m.id, capitalize(m.label))}>
-                          Delete
-                        </button>
-                      </>
-                    )}
-                    {isCurrent && m.downloaded && !lib.running && !lib.loading && (
-                      <button type="button" className="btn" disabled={busy === m.id}
-                        onClick={() => run(m.id, () => api.loadModel())}>
-                        Load
+                      <button type="button" className="btn btn-danger" disabled={busy === m.id}
+                        onClick={() => deleteModel(m.id, capitalize(m.label))}>
+                        Delete
                       </button>
-                    )}
-                    {isCurrent && lib.loading && (
-                      <button type="button" className="btn" disabled>Loading…</button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </>
+                  )}
+                  {isCurrent && m.downloaded && !lib.running && !lib.loading && (
+                    <button type="button" className="btn" disabled={busy === m.id}
+                      onClick={() => run(m.id, () => api.loadModel())}>
+                      Load
+                    </button>
+                  )}
+                  {isCurrent && lib.loading && (
+                    <button type="button" className="btn" disabled>Loading…</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

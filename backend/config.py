@@ -40,10 +40,10 @@ MODELS = {
     },
     "medium": {
         "repo": "ConwayResearch/Underdog-Saluki-27B-1.0",
-        "file": "Underdog-Saluki-27B-1.0-IQ2-mix.gguff",
+        "file": "Underdog-Saluki-27B-1.0-IQ2-mix.gguf",
         "temp": 0.7,
         "ctx": 100000,
-        "kv_quant": llama_cpp.GGML_TYPE_Q4_0,
+        "kv_quant": llama_cpp.GGML_TYPE_Q4_0, 
         "flash_attn": True,
         "description": "100K ctx • 12GB VRAM or 16GB RAM • Strong performance for demanding tasks",
     },

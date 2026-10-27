@@ -417,7 +417,7 @@ body {
   color: #fff;
 }
 
-.composer .send:hover { background: #000; }
+.composer .send:hover { background: #000; color: #fff; }
 
 .composer .send:disabled {
   background: #ebeae6;
@@ -552,6 +552,8 @@ body {
 
 .menu-option .check { flex: none; width: 15px; height: 15px; opacity: 0; }
 .menu-option[aria-checked="true"] .check { opacity: 1; }
+.model-menu .menu-option[aria-checked="true"] { background: #f5f4f1; }
+.model-menu .menu-option[aria-checked="true"] .opt-name { font-weight: 600; }
 
 .menu-option .opt-icon { flex: none; width: 15px; height: 15px; color: var(--muted); }
 
@@ -717,15 +719,35 @@ body {
 .settings-actions .btn { font-size: 12px; padding: 4px 8px; }
 
 .settings-row {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px 16px;
+  align-items: start;
+  padding: 14px 0;
   border-top: 1px solid var(--border);
 }
 
 .settings-row:first-child { border-top: 0; }
 
-.settings-info { flex: 1; min-width: 0; }
+.settings-row.is-current { background: #f5f4f1; border-radius: 8px; padding: 14px 10px; margin: 0 -10px; }
+
+@media (max-width: 520px) {
+  .settings-row { grid-template-columns: 1fr; }
+  .settings-meta { flex-direction: row; align-items: center; justify-content: flex-start; }
+  .settings-actions { justify-content: flex-start; }
+}
+
+.settings-info { min-width: 0; }
+
+.settings-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.settings-size { font-size: 12px; color: var(--foot); }
 
 .settings-name {
   display: flex;
