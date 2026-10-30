@@ -47,8 +47,11 @@ export const api = {
   chat: (content) =>
     req('/api/chat', { method: 'POST', body: JSON.stringify({ content }) }),
   library: () => req('/api/models/library'),
+  system: () => req('/api/system'),
   startDownload: (id) =>
     req('/api/models/download', { method: 'POST', body: JSON.stringify({ name: id }) }),
+  cancelDownload: (id) =>
+    req('/api/models/download/cancel', { method: 'POST', body: JSON.stringify({ name: id }) }),
   downloadProgress: () => req('/api/models/download/progress'),
   deleteModel: (id) =>
     req(`/api/models/library/${encodeURIComponent(id)}`, { method: 'DELETE' }),

@@ -6,7 +6,7 @@ import ModelMenu from './components/ModelMenu.jsx';
 import ChatThread from './components/ChatThread.jsx';
 import Composer from './components/Composer.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
-import SettingsPopup from './components/SettingsPopup.jsx';
+import SettingsPage from './components/SettingsPage.jsx';
 import { modelLabel } from './components/icons.jsx';
 import { api, desktop, streamChat } from './api.js';
 
@@ -21,6 +21,10 @@ export default function App() {
   const [model, setModel] = useState('');
   const [modelMock, setModelMock] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(true);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateDownloaded, setUpdateDownloaded] = useState(false);
+  const [updateVersion, setUpdateVersion] = useState('');
+  const [updateProgress, setUpdateProgress] = useState(0);
   const [ask, setAsk] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
@@ -28,9 +32,13 @@ export default function App() {
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState(null);
+  const [tokPerSec, setTokPerSec] = useState(0);
   const [error, setError] = useState('');
   const abort = useRef(null);
   const askResolve = useRef(null);
+  const partialRef = useRef('');
+  const streamStartRef = useRef(0);
+  const tokenCountRef = useRef(0);
 
   const closeMenus = useCallback(() => {
     setProjectOpen(false);
@@ -95,6 +103,14 @@ export default function App() {
   }, [loadHistory, refreshNav]);
 
   useEffect(() => {
+    if (!window.electron) return;
+    const off1 = window.electron.onUpdateAvailable?.((v) => { setUpdateAvailable(true); setUpdateVersion(v || ''); });
+    const off2 = window.electron.onUpdateDownloaded?.((v) => { setUpdateDownloaded(true); setUpdateVersion(v || ''); });
+    const off3 = window.electron.onUpdateProgress?.((v) => setUpdateProgress(v || 0));
+    return () => { off1?.(); off2?.(); off3?.(); };
+  }, []);
+
+  useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') {
         closeMenus();
@@ -116,27 +132,45 @@ export default function App() {
       setInput('');
       setStreaming(true);
       setStreamingText('');
+      setTokPerSec(0);
+      partialRef.current = '';
+      streamStartRef.current = Date.now();
+      tokenCountRef.current = 0;
       refreshNav(); // a brand-new chat (or title) shows up in the sidebar
 
       const controller = new AbortController();
       abort.current = controller;
       let full = '';
+      let cancelled = false;
       try {
         full = await streamChat(text, {
           signal: controller.signal,
-          onToken: (_tok, assembled) => setStreamingText(assembled),
+          onToken: (_tok, assembled) => {
+            tokenCountRef.current += 1;
+            partialRef.current = assembled;
+            setStreamingText(assembled);
+            const elapsed = (Date.now() - streamStartRef.current) / 1000;
+            if (elapsed > 0) setTokPerSec(tokenCountRef.current / elapsed);
+          },
         });
       } catch (err) {
-        if (err.name !== 'AbortError') {
+        if (err.name === 'AbortError') {
+          cancelled = true;
+        } else {
           console.error('Chat failed:', err);
           setError(String(err.message || err));
         }
       } finally {
         abort.current = null;
         setStreaming(false);
+        if (cancelled && partialRef.current) {
+          // Keep the partial result in the thread instead of discarding it.
+          setMessages((m) => [...m, { role: 'assistant', content: partialRef.current }]);
+        }
         setStreamingText(null);
+        setTokPerSec(0);
         // The backend persisted both messages; re-read for the canonical state.
-        await loadHistory();
+        if (!cancelled) await loadHistory();
         await refreshNav();
       }
       return full;
@@ -146,6 +180,7 @@ export default function App() {
 
   const newChat = useCallback(async () => {
     stopStream();
+    setSettingsOpen(false);
     setMessages([]);
     setInput('');
     try {
@@ -159,6 +194,7 @@ export default function App() {
   const openChat = useCallback(
     async (id) => {
       stopStream();
+      setSettingsOpen(false);
       try {
         await api.openChat(id);
       } catch (err) {
@@ -277,6 +313,13 @@ export default function App() {
     setModelMock(status.mock ?? false);
   }, []);
 
+  const toggleConfirmDelete = useCallback((next) => {
+    // next = true means "don't ask"
+    const value = !next;
+    setConfirmDelete(value);
+    api.setSetting('confirm_delete', value).catch((err) => console.error(err));
+  }, []);
+
   const projectName =
     projects.find((p) => p.path === currentProject)?.name ?? currentProject;
   const isHero = messages.length === 0 && streamingText === null;
@@ -293,8 +336,24 @@ export default function App() {
         onOpen={openChat}
         onDelete={deleteChat}
         onOpenSettings={() => setSettingsOpen(true)}
+        updateAvailable={updateAvailable}
       />
 
+      {settingsOpen ? (
+        <div className="pane">
+          <SettingsPage
+            onClose={() => setSettingsOpen(false)}
+            confirm={confirm}
+            onUsed={handleUsed}
+            confirmDelete={confirmDelete}
+            onToggleConfirmDelete={toggleConfirmDelete}
+            updateAvailable={updateAvailable}
+            updateDownloaded={updateDownloaded}
+            updateVersion={updateVersion}
+            updateProgress={updateProgress}
+          />
+        </div>
+      ) : (
       <div className={`pane${isHero ? ' is-hero' : ''}`}>
         <TopBar
           projectName={projectName}
@@ -318,7 +377,7 @@ export default function App() {
           }
         />
 
-        {!isHero && <ChatThread messages={messages} streamingText={streamingText} />}
+        {!isHero && <ChatThread messages={messages} streamingText={streamingText} tokPerSec={tokPerSec} />}
         {error && (
           <div className="dock" style={{ paddingBottom: 0 }}>
             <div className="error-bubble">{error}</div>
@@ -362,14 +421,9 @@ export default function App() {
           </div>
         </div>
       </div>
+      )}
 
       <ConfirmDialog ask={ask} onResolve={resolveAsk} />
-      <SettingsPopup
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        confirm={confirm}
-        onUsed={handleUsed}
-      />
     </div>
   );
 }

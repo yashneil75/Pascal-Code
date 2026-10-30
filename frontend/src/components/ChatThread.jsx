@@ -24,7 +24,7 @@ function Spinner() {
   return <span className="spinner" aria-label="Thinking" />;
 }
 
-function Message({ role, content, streaming }) {
+function Message({ role, content, streaming, tokPerSec }) {
   const copyBtn = useRef(null);
 
   const copy = async () => {
@@ -62,7 +62,12 @@ function Message({ role, content, streaming }) {
         </details>
       )}
       {answer && <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>}
-      {showSpinner && <div className="stream-spinner"><Spinner /></div>}
+      {showSpinner && (
+        <div className="stream-spinner">
+          <Spinner />
+          <span className="tokps">{(tokPerSec || 0).toFixed(1)} tok/s</span>
+        </div>
+      )}
       {!streaming && content && (
         <div className="actions">
           <button ref={copyBtn} type="button" data-copy aria-label="Copy" onClick={copy}>
@@ -80,24 +85,40 @@ function Message({ role, content, streaming }) {
   );
 }
 
-export default function ChatThread({ messages, streamingText }) {
+export default function ChatThread({ messages, streamingText, tokPerSec }) {
   const ref = useRef(null);
+  const stickToBottom = useRef(true);
+
+  const isNearBottom = () => {
+    const el = ref.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  };
 
   useEffect(() => {
     const el = ref.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el && stickToBottom.current) el.scrollTop = el.scrollHeight;
   }, [messages, streamingText]);
+
+  const onScroll = () => {
+    stickToBottom.current = isNearBottom();
+  };
+
+  // A new message (sent or loaded) should re-engage auto-follow.
+  useEffect(() => {
+    stickToBottom.current = true;
+  }, [messages.length]);
 
   const visible = messages.filter(
     ({ role, content }) => (role === 'user' || role === 'assistant') && content,
   );
 
   return (
-    <main ref={ref} className="thread" aria-live="polite">
+    <main ref={ref} className="thread" aria-live="polite" onScroll={onScroll}>
       {visible.map((m, i) => (
-        <Message key={i} role={m.role} content={m.content} />
+        <Message key={i} role={m.role} content={m.content} tokPerSec={tokPerSec} />
       ))}
-      {streamingText !== null && <Message role="assistant" content={streamingText} streaming />}
+      {streamingText !== null && <Message role="assistant" content={streamingText} streaming tokPerSec={tokPerSec} />}
     </main>
   );
 }

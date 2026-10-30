@@ -23,6 +23,7 @@ from backend import config
 # status is one of queued/downloading/done/error.
 _progress: dict[str, dict] = {}
 _progress_lock = threading.Lock()
+_cancelled: set[str] = set()
 
 CUSTOM_CTX = 32768
 
@@ -64,10 +65,19 @@ def library() -> list[dict]:
             {
                 "id": tier,
                 "label": tier,
+                "remote_bytes": (int(spec.get("size_gb", 0) * 1e9) if spec.get("size_gb") is not None else None),
                 "description": spec["description"],
                 "downloaded": path is not None,
                 "size_bytes": path.stat().st_size if path is not None else None,
                 "path": str(path) if path is not None else None,
+                "tier": spec.get("tier", tier),
+                "ctx": spec.get("ctx"),
+                "min_vram_gb": spec.get("min_vram_gb"),
+                "min_ram_gb": spec.get("min_ram_gb"),
+                "performance": spec.get("performance"),
+                "arch": spec.get("arch"),
+                "quant": spec.get("quant"),
+                "repo": spec.get("repo"),
             }
         )
     return entries
@@ -87,7 +97,8 @@ def remote_size(name: str) -> int | None:
         meta = get_hf_file_metadata(spec["repo"], spec["file"])
         _remote_cache[name] = meta.size
     except Exception:
-        _remote_cache[name] = None
+        preset = spec.get("size_gb")
+        _remote_cache[name] = int(preset * 1e9) if preset is not None else None
     return _remote_cache[name]
 
 
@@ -137,6 +148,14 @@ def start_download(name: str) -> dict:
     return download_progress()[name]
 
 
+def cancel_download(name: str) -> None:
+    _cancelled.add(name)
+    with _progress_lock:
+        if name in _progress:
+            _progress[name]["status"] = "cancelled"
+            _progress[name]["error"] = "Cancelled"
+
+
 def _download_worker(name: str) -> None:
     spec = config.MODELS[name]
     dest = local_path(name)
@@ -155,6 +174,8 @@ def _download_worker(name: str) -> None:
             done = 0
             with open(tmp, "wb") as fh:
                 for chunk in resp.iter_content(chunk_size=1024 * 1024):
+                    if name in _cancelled:
+                        raise RuntimeError("Cancelled")
                     if not chunk:
                         continue
                     fh.write(chunk)
@@ -167,7 +188,11 @@ def _download_worker(name: str) -> None:
             tmp.unlink(missing_ok=True)
         except OSError:
             pass
-        _set_progress(name, status="error", error=str(exc))
+        if name in _cancelled:
+            _set_progress(name, status="cancelled", error=None)
+            _cancelled.discard(name)
+        else:
+            _set_progress(name, status="error", error=str(exc))
 
 
 def download(name: str) -> Path:

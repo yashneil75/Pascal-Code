@@ -134,6 +134,14 @@ ipcMain.handle('dialog:open-folder', async () => {
   return res.filePaths[0];
 });
 
+ipcMain.handle('update:check', async () => {
+  try { return await autoUpdater.checkForUpdates(); }
+  catch (err) { console.error('update check failed:', err); throw err; }
+});
+ipcMain.handle('update:install', () => {
+  autoUpdater.quitAndInstall();
+});
+
 app.on('second-instance', () => {
   if (mainWindow) {
     if (mainWindow.isMinimized()) mainWindow.restore();
@@ -157,6 +165,9 @@ app.whenReady().then(async () => {
   // Auto-update from GitHub Releases (published by the release workflow).
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.on('update-available', (info) => mainWindow?.webContents.send('update:available', info?.version || ''));
+  autoUpdater.on('update-downloaded', (info) => mainWindow?.webContents.send('update:downloaded', info?.version || ''));
+  autoUpdater.on('download-progress', (p) => mainWindow?.webContents.send('update:progress', Math.round(p?.percent || 0)));
   autoUpdater.checkForUpdatesAndNotify().catch((err) => console.error('update check failed:', err));
 
   app.on('activate', () => {

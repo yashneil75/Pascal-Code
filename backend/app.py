@@ -117,6 +117,88 @@ def health() -> dict:
     return {"ok": True}
 
 
+@app.get("/api/system")
+def system_info() -> dict:
+    import ctypes, subprocess, re
+    # RAM (Windows)
+    ram_total = 0
+    ram_avail = 0
+    try:
+        class MEMORYSTATUSEX(ctypes.Structure):
+            _fields_ = [
+                ("dwLength", ctypes.c_ulong),
+                ("dwMemoryLoad", ctypes.c_ulong),
+                ("ullTotalPhys", ctypes.c_ulonglong),
+                ("ullAvailPhys", ctypes.c_ulonglong),
+                ("ullTotalPageFile", ctypes.c_ulonglong),
+                ("ullAvailPageFile", ctypes.c_ulonglong),
+                ("ullTotalVirtual", ctypes.c_ulonglong),
+                ("ullAvailVirtual", ctypes.c_ulonglong),
+                ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+            ]
+        stat = MEMORYSTATUSEX()
+        stat.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+        ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
+        ram_total = stat.ullTotalPhys / (1024**3)
+        ram_avail = stat.ullAvailPhys / (1024**3)
+    except Exception:
+        pass
+    # VRAM: try discrete GPU (nvidia-smi), then iGPU/CPU-shared via WMI.
+    vram_total = None
+    vram_free = None
+    gpu_type = "none"
+    try:
+        out = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=memory.total,memory.free", "--format=csv,noheader,nounits"],
+            stderr=subprocess.DEVNULL, text=True, timeout=5)
+        parts = out.strip().split(",")
+        if len(parts) >= 2:
+            vram_total = float(parts[0].strip()) / 1024.0
+            vram_free = float(parts[1].strip()) / 1024.0
+            gpu_type = "discrete"
+    except Exception:
+        pass
+    if vram_total is None:
+        # Fall back to Windows video controllers (iGPU or CPU).
+        try:
+            out = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command",
+                 "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty AdapterRAM"],
+                stderr=subprocess.DEVNULL, text=True, timeout=8)
+            vals = []
+            for line in out.split():
+                try:
+                    vals.append(float(line))
+                except ValueError:
+                    pass
+            if vals:
+                best = max(vals)
+                best_gb = best / (1024**3)
+                # iGPU reports a small dedicated slice but can use system RAM.
+                if best_gb < ram_total * 0.5:
+                    vram_total = ram_total
+                    vram_free = ram_avail
+                    gpu_type = "integrated"
+                else:
+                    vram_total = best_gb
+                    vram_free = best_gb
+                    gpu_type = "discrete"
+        except Exception:
+            pass
+    if vram_total is None:
+        # No GPU info at all -> assume CPU using system RAM.
+        vram_total = ram_total
+        vram_free = ram_avail
+        gpu_type = "cpu"
+    return {
+        "ram_total_gb": round(ram_total, 1),
+        "ram_available_gb": round(ram_avail, 1),
+        "vram_total_gb": (round(vram_total, 1) if vram_total is not None else None),
+        "vram_available_gb": (round(vram_free, 1) if vram_free is not None else None),
+        "gpu_type": gpu_type,
+    }
+
+
 @app.get("/api/models")
 def get_models() -> dict:
     status = manager.status()
@@ -148,7 +230,10 @@ def get_library() -> dict:
     entries = download_mod.library()
     for entry in entries:
         if not entry["downloaded"]:
-            entry["remote_bytes"] = download_mod.remote_size(entry["id"])
+            remote = download_mod.remote_size(entry["id"])
+            if remote is None:
+                remote = entry.get("remote_bytes")
+            entry["remote_bytes"] = remote
     return {
         "current": status["current"],
         "running": status["running"],
@@ -166,6 +251,13 @@ def start_model_download(body: SelectModelBody) -> dict:
         return download_mod.start_download(body.name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/api/models/download/cancel")
+def cancel_model_download(body: SelectModelBody) -> dict:
+    from backend import download as download_mod
+    download_mod.cancel_download(body.name)
+    return {"cancelled": body.name}
 
 
 @app.get("/api/models/download/progress")

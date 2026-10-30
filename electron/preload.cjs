@@ -19,6 +19,23 @@ contextBridge.exposeInMainWorld('electron', {
   toggleMaximize: () => ipcRenderer.invoke('window:toggle-maximize'),
   close: () => ipcRenderer.invoke('window:close'),
   openFolder: () => ipcRenderer.invoke('dialog:open-folder'),
+  checkForUpdates: () => ipcRenderer.invoke('update:check'),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
+  onUpdateAvailable: (cb) => {
+    const listener = (_e, v) => cb(v);
+    ipcRenderer.on('update:available', listener);
+    return () => ipcRenderer.removeListener('update:available', listener);
+  },
+  onUpdateDownloaded: (cb) => {
+    const listener = (_e, v) => cb(v);
+    ipcRenderer.on('update:downloaded', listener);
+    return () => ipcRenderer.removeListener('update:downloaded', listener);
+  },
+  onUpdateProgress: (cb) => {
+    const listener = (_e, v) => cb(v);
+    ipcRenderer.on('update:progress', listener);
+    return () => ipcRenderer.removeListener('update:progress', listener);
+  },
   onMaximized: (cb) => {
     const listener = (_event, value) => cb(value);
     ipcRenderer.on('window:maximized', listener);

@@ -1,7 +1,7 @@
 import { BIN, PEN, GEAR, FOLDER } from './icons.jsx';
 import logo from '../../../Logo.png';
 
-export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete, onOpenSettings }) {
+export default function Sidebar({ chats, current, projectList, onNew, onOpen, onDelete, onOpenSettings, updateAvailable }) {
   const groups = new Map();
   for (const chat of chats) {
     if (!groups.has(chat.project)) groups.set(chat.project, []);
@@ -19,6 +19,11 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
         {PEN}
         New chat
       </button>
+      {updateAvailable && (
+        <button type="button" className="new-chat" onClick={onOpenSettings} style={{ fontSize: 12, color: 'var(--muted)' }}>
+          new update available →
+        </button>
+      )}
       <nav className="chats" aria-label="Chats">
         {order.map((path) => {
           if (!groups.has(path)) return null;
