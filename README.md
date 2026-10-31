@@ -1,10 +1,10 @@
-# Pascal Code Desktop
+# Simpld Desktop
 
 Desktop chat app. React (Vite) frontend, Python (FastAPI + llama.cpp) backend,
 Electron frameless shell.
 
 ```
-Pascal-Code-Desktop/
+Simpld-Desktop/
   backend/          Python API: app.py (FastAPI), config.py, store.py,
                     model.py, download.py, requirements.txt
     test_store.py   SQLite store tests (15 tests)
@@ -22,13 +22,13 @@ npm run dist
 ```
 
 That does three steps: `frontend:build` (React → `frontend/dist/`),
-`backend:build` (PyInstaller freezes Python → `dist-backend/pascal-backend/`),
+`backend:build` (PyInstaller freezes Python → `dist-backend/simpld-backend/`),
 then electron-builder packages both into `release/`:
 
-- `Pascal-Code-0.1.0-setup.exe` — installer (Start Menu shortcut, uninstaller)
-- `Pascal-Code-0.1.0-portable.exe` — single file, runs anywhere
+- `Simpld-0.1.0-setup.exe` — installer (Start Menu shortcut, uninstaller)
+- `Simpld-0.1.0-portable.exe` — single file, runs anywhere
 
-Double-click either: one Pascal Code window opens, the frozen backend starts
+Double-click either: one Simpld window opens, the frozen backend starts
 silently beside it and is killed on quit. Single-instance: launching again
 just focuses the existing window.
 
@@ -39,7 +39,7 @@ mock model; download weights once per machine and restart:
 python -m backend.download lite
 ```
 
-Weights and chats live in `%USERPROFILE%\.pascal_code`, shared by dev and
+Weights and chats live in `%USERPROFILE%\.simpld`, shared by dev and
 packaged runs.
 
 ## Dev

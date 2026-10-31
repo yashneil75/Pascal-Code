@@ -1,5 +1,5 @@
 {
-  "name": "pascal-code-frontend",
+  "name": "simpld-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "pascal-code-desktop": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "simpld-desktop": "file:.."
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

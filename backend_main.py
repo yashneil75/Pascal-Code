@@ -1,10 +1,10 @@
-"""PyInstaller entry point for the Pascal Code backend.
+"""PyInstaller entry point for the Simpld backend.
 
-Build:  pyinstaller --noconfirm --clean --name pascal-backend --onedir ^
+Build:  pyinstaller --noconfirm --clean --name simpld-backend --onedir ^
             --console --distpath dist-backend --workpath build-backend backend_main.py
 
 The frozen exe behaves exactly like `python -m backend.app`: it reads
-PASCAL_PORT / PASCAL_MODEL_DIR / PASCAL_MOCK from the environment, which the
+SIMPLD_PORT / SIMPLD_MODEL_DIR / SIMPLD_MOCK from the environment, which the
 Electron shell sets when it spawns the sidecar.
 """
 

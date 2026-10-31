@@ -12,8 +12,8 @@ export default function Sidebar({ chats, current, projectList, onNew, onOpen, on
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <img src={logo} alt="Pascal Code" className="sidebar-logo" />
-        <span className="sidebar-title">Pascal Code</span>
+        <img src={logo} alt="Simpld" className="sidebar-logo" />
+        <span className="sidebar-title">Simpld</span>
       </div>
       <button type="button" className="new-chat" onClick={onNew}>
         {PEN}

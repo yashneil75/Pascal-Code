@@ -36,7 +36,7 @@ class StoreTest(unittest.TestCase):
 
     def test_round_trip_keeps_llama_cpp_message_shape(self):
         messages = [
-            {"role": "system", "content": "You are Pascal Code."},
+            {"role": "system", "content": "You are Simply."},
             {"role": "user", "content": "list the files"},
             {
                 "role": "assistant",

@@ -24,13 +24,13 @@ const isDev = !app.isPackaged;
 if (!app.requestSingleInstanceLock()) app.quit();
 
 let backendProc = null;
-let backendPort = Number(process.env.PASCAL_PORT || 8000);
+let backendPort = Number(process.env.SIMPLD_PORT || 8000);
 let mainWindow = null;
 
 function backendBin() {
   if (process.env.BACKEND_BIN) return process.env.BACKEND_BIN;
   if (!app.isPackaged) return null; // dev: use `python -m backend.app`
-  const exe = process.platform === 'win32' ? 'pascal-backend.exe' : 'pascal-backend';
+  const exe = process.platform === 'win32' ? 'simpld-backend.exe' : 'simpld-backend';
   const bundled = path.join(process.resourcesPath, 'backend', exe);
   if (fs.existsSync(bundled)) return bundled;
   // Fallback for unpacked/portable layouts.
@@ -68,7 +68,7 @@ async function waitForBackend(port, timeoutMs = 45000) {
 
 function startBackend(port) {
   const projectRoot = path.join(__dirname, '..');
-  const env = { ...process.env, PASCAL_PORT: String(port) };
+  const env = { ...process.env, SIMPLD_PORT: String(port) };
   const bin = backendBin();
   if (bin) {
     console.log(`starting backend: ${bin}`);
@@ -159,7 +159,7 @@ app.whenReady().then(async () => {
   } else {
     console.log(`reusing backend on port ${backendPort}`);
   }
-  process.env.PASCAL_PORT = String(backendPort);
+  process.env.SIMPLD_PORT = String(backendPort);
   createWindow(backendPort);
 
   // Auto-update from GitHub Releases (published by the release workflow).

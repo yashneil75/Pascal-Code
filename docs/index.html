@@ -3,24 +3,339 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pascal Code Downloads</title>
+  <meta name="description" content="Download Simpld, a free, offline AI coding assistant that runs entirely on your own GPU." />
+  <meta name="theme-color" content="#000000" />
+  <title>Simpld: Downloads</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
-    h1 { margin-bottom: 8px; }
-    p { color: #555; }
-    .btn { display: block; padding: 14px 18px; margin: 10px 0; background: #6b6b68; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; }
-    .btn:hover { background: #4b4b47; }
+    /* 2010 pop-poster, inverted: pure black stage, white ink, zero curve. */
+    :root {
+      --black: #000;
+      --white: #fff;
+      --gray: #8a8a8a;
+      --gray-dark: #3a3a3a;
+      --display: "Anton", "Arial Narrow", Impact, sans-serif;
+      --body: Arial, Helvetica, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--black); }
+
+    body {
+      margin: 0;
+      background: var(--black);
+      color: var(--white);
+      font: 16px/1.5 var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--white); color: var(--black); }
+
+    a { color: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--white);
+      outline-offset: 2px;
+    }
+
+    /* On the poster sky: a fixed field of stars lit from a horizon below. */
+    .stage {
+      position: relative;
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 0 24px 96px;
+    }
+
+    .stage::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(1.5px 1.5px at 12% 22%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 31% 58%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 44% 12%, var(--white) 50%, transparent 51%),
+        radial-gradient(2px 2px at 57% 41%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 66% 74%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 78% 18%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 89% 62%, var(--white) 50%, transparent 51%),
+        radial-gradient(2px 2px at 8% 86%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 23% 42%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 52% 91%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 71% 33%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 94% 88%, var(--white) 50%, transparent 51%),
+        radial-gradient(13% 6% at 27% 34%, rgba(255, 255, 255, .10), transparent 100%),
+        radial-gradient(11% 5% at 74% 63%, rgba(255, 255, 255, .08), transparent 100%),
+        radial-gradient(ellipse 90% 45% at 50% 120%, rgba(255, 255, 255, .3), transparent 62%);
+      pointer-events: none;
+    }
+
+    /* Faint scanlines, like a remembered tube screen. */
+    .stage::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 2px,
+        rgba(255, 255, 255, .025) 2px 3px
+      );
+      pointer-events: none;
+    }
+
+    /* Hero: two stacked poster lines, the second stamped in outline only. */
+    .hero {
+      padding: clamp(4rem, 12vh, 7rem) 0 3rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: clamp(3.2rem, 13vw, 7.5rem);
+      line-height: .95;
+      letter-spacing: .01em;
+      text-transform: uppercase;
+      animation: rise .7s ease-out both;
+    }
+
+    .hero h1 .ghost {
+      display: block;
+      color: var(--white);
+      font-size: .62em;
+    }
+
+    @supports ((-webkit-text-stroke: 2px var(--white))) {
+      .hero h1 .ghost {
+        color: transparent;
+        -webkit-text-stroke: 2px var(--white);
+      }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Chip links share the row vocabulary: boxed, then inverted on hover. */
+    .hero-link {
+      display: inline-block;
+      margin-top: 1.6rem;
+      font-family: var(--display);
+      font-size: 1rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px 22px;
+      border: 1px solid currentColor;
+      transition: background .12s ease, color .12s ease;
+      animation: rise .7s .1s ease-out both;
+    }
+
+    .hero-link:hover,
+    .hero-link:focus-visible {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .hero .sub {
+      max-width: 34rem;
+      margin: 1.4rem auto 0;
+      color: var(--gray);
+      animation: rise .7s .15s ease-out both;
+    }
+
+    /* Download rows: hard edges, mirrored hard edges on focus. */
+    .groups {
+      margin-top: 3rem;
+      animation: rise .7s .25s ease-out both;
+    }
+
+    .group + .group { margin-top: 2.6rem; }
+
+    .group h2 {
+      margin: 0 0 10px;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: 1.4rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .rows {
+      border-top: 2px solid var(--white);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px 24px;
+      padding: 16px 6px;
+      border-bottom: 1px solid var(--gray-dark);
+      text-decoration: none;
+      transition: background .12s ease, color .12s ease;
+    }
+
+    .row:hover,
+    .row:focus-visible {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .row-name {
+      font-family: var(--display);
+      font-size: 1.25rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .row-desc {
+      grid-column: 1;
+      font-size: 13px;
+      color: var(--gray);
+      transition: color .12s ease;
+    }
+
+    .row:hover .row-desc,
+    .row:focus-visible .row-desc { color: var(--gray-dark); }
+
+    .row-get {
+      grid-row: 1 / span 2;
+      grid-column: 2;
+      font-family: var(--display);
+      font-size: 1rem;
+      letter-spacing: .1em;
+      border: 1px solid currentColor;
+      padding: 10px 22px;
+      text-align: center;
+      transition: background .12s ease, color .12s ease;
+    }
+
+    .row:hover .row-get,
+    .row:focus-visible .row-get {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+
+    /* Small print: how to get past the OS gatekeepers. */
+    .fineprint {
+      margin-top: 2.6rem;
+      padding-top: 14px;
+      border-top: 1px solid var(--gray-dark);
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .fineprint strong { color: var(--white); font-weight: bold; }
+
+    .fineprint p { margin: 6px 0; }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    footer .all { color: var(--white); font-weight: bold; }
+
+    footer .sign {
+      margin: 10px 0 0;
+      font-family: var(--display);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .8rem;
+    }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+      .row-get {
+        grid-row: auto;
+        grid-column: 1;
+        justify-self: start;
+        padding: 10px 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero h1, .hero .sub, .hero-link, .groups { animation: none; }
+      .row, .row-get, .row-desc, .hero-link { transition: none; }
+    }
   </style>
 </head>
 <body>
-  <h1>Pascal Code Downloads</h1>
-  <p>Latest release builds. Pick the one matching your OS and GPU backend.</p>
-  <p><strong>Windows:</strong> SmartScreen may warn; click "More info" then "Run anyway". <strong>macOS:</strong> Right-click the app and choose "Open"</p>
-  <a class="btn" href="https://github.com/yashneil75/Pascal-Code/releases/latest/download/Pascal-Code-windows-cuda.exe">Windows (CUDA)</a>
-  <a class="btn" href="https://github.com/yashneil75/Pascal-Code/releases/latest/download/Pascal-Code-windows-vulkan.exe">Windows (Vulkan)</a>
-  <a class="btn" href="https://github.com/yashneil75/Pascal-Code/releases/latest/download/Pascal-Code-macos-metal.dmg">macOS (Metal)</a>
-  <a class="btn" href="https://github.com/yashneil75/Pascal-Code/releases/latest/download/Pascal-Code-linux-cuda.AppImage">Linux (CUDA)</a>
-  <a class="btn" href="https://github.com/yashneil75/Pascal-Code/releases/latest/download/Pascal-Code-linux-vulkan.AppImage">Linux (Vulkan)</a>
-  <p><a href="https://github.com/yashneil75/Pascal-Code/releases">All releases</a></p>
+  <main class="stage">
+    <header class="hero">
+      <h1>
+        <span class="ghost">Simpld</span>
+        Downloads
+      </h1>
+      <a class="hero-link" href="./about.html">Learn about us <span aria-hidden="true">→</span></a>
+      <p class="sub">Every build below is free forever and runs entirely on your machine.</p>
+    </header>
+
+    <section class="groups" aria-label="Downloads by platform">
+      <div class="group">
+        <h2>Windows</h2>
+        <div class="rows">
+          <a class="row" href="https://github.com/yashneil75/Simpld/releases/latest/download/Simpld-windows-cuda.exe">
+            <span class="row-name">Windows (CUDA)</span>
+            <span class="row-desc">NVIDIA GPUs. The fastest path, every shader lit.</span>
+            <span class="row-get">Download</span>
+          </a>
+          <a class="row" href="https://github.com/yashneil75/Simpld/releases/latest/download/Simpld-windows-vulkan.exe">
+            <span class="row-name">Windows (Vulkan)</span>
+            <span class="row-desc">AMD and Intel GPUs too. If it has drivers, it runs.</span>
+            <span class="row-get">Download</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>macOS</h2>
+        <div class="rows">
+          <a class="row" href="https://github.com/yashneil75/Simpld/releases/latest/download/Simpld-macos-metal.dmg">
+            <span class="row-name">macOS (Metal)</span>
+            <span class="row-desc">Apple Silicon only, Intel Macs not supported yet.</span>
+            <span class="row-get">Download</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Linux</h2>
+        <div class="rows">
+          <a class="row" href="https://github.com/yashneil75/Simpld/releases/latest/download/Simpld-linux-cuda.AppImage">
+            <span class="row-name">Linux (CUDA)</span>
+            <span class="row-desc">NVIDIA rigs, the enthusiast's choice since forever.</span>
+            <span class="row-get">Download</span>
+          </a>
+          <a class="row" href="https://github.com/yashneil75/Simpld/releases/latest/download/Simpld-linux-vulkan.AppImage">
+            <span class="row-name">Linux (Vulkan)</span>
+            <span class="row-desc">Anything else that can push triangles.</span>
+            <span class="row-get">Download</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <aside class="fineprint">
+      <p><strong>Windows:</strong> SmartScreen may warn on first launch. Click "More info", then "Run anyway".</p>
+      <p><strong>macOS:</strong> Right-click the app and choose "Open" the first time you run it.</p>
+    </aside>
+
+    <footer>
+      <a class="all" href="https://github.com/yashneil75/Simpld/releases">Browse all releases</a>
+      <p class="sign">★ Simpld: yours, offline, always ★</p>
+    </footer>
+  </main>
 </body>
 </html>

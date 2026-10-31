@@ -6,4 +6,4 @@ dist-backend/
 build-backend/
 release/
 *.db
-pascal-backend.spec
+simpld-backend.spec

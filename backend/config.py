@@ -1,4 +1,4 @@
-"""Shared paths and model catalogue for the Pascal Code backend.
+"""Shared paths and model catalogue for the Simpld backend.
 
 Same values as the old top-level config.py; now importable as backend.config
 so both the FastAPI app and the model/store helpers share one source of truth.
@@ -11,7 +11,7 @@ from pathlib import Path
 
 from llama_cpp import llama_cpp
 
-MODEL_DIR = Path(os.environ.get("PASCAL_MODEL_DIR", Path.home() / ".pascal_code"))
+MODEL_DIR = Path(os.environ.get("SIMPLD_MODEL_DIR", Path.home() / ".simpld"))
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 # Where chats go when no project folder has been picked.
@@ -19,13 +19,13 @@ WORKSPACE = MODEL_DIR / "workspace"
 WORKSPACE.mkdir(parents=True, exist_ok=True)
 
 # Port the API listens on. Electron spawns the backend with a free port and
-# passes it as PASCAL_PORT; `python -m backend.app` falls back to 8000.
-PORT = int(os.environ.get("PASCAL_PORT", "8000"))
+# passes it as SIMPLD_PORT; `python -m backend.app` falls back to 8000.
+PORT = int(os.environ.get("SIMPLD_PORT", "8000"))
 
 # When true, chat replies use a canned mock instead of loading GGUF weights.
 # Useful for UI work without a multi-GB download. Automatically enabled when
-# the selected model file is not on disk (unless PASCAL_STRICT=1).
-MOCK_ENV = os.environ.get("PASCAL_MOCK", "").lower() in ("1", "true", "yes")
+# the selected model file is not on disk (unless SIMPLD_STRICT=1).
+MOCK_ENV = os.environ.get("SIMPLD_MOCK", "").lower() in ("1", "true", "yes")
 STRICT_ENV = True # no longer used so just set to True(no canned responses), but kept for backwards compatibility with old env vars
 
 MODELS = {

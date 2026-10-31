@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="About Simpld and Simply, a free, offline AI coding assistant that runs entirely on your own GPU." />
+  <meta name="theme-color" content="#000000" />
+  <title>Simpld: About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+  <style>
+    /* Shared night-sky poster language with the download page: black stage,
+       white ink, zero curve. This page is text alone: no boxes, no rules. */
+    :root {
+      --black: #000;
+      --white: #fff;
+      --gray: #8a8a8a;
+      --gray-dark: #3a3a3a;
+      --display: "Anton", "Arial Narrow", Impact, sans-serif;
+      --body: Arial, Helvetica, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--black); }
+
+    body {
+      margin: 0;
+      background: var(--black);
+      color: var(--white);
+      font: 16px/1.55 var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--white); color: var(--black); }
+
+    :focus-visible {
+      outline: 2px solid var(--white);
+      outline-offset: 2px;
+    }
+
+    .stage {
+      position: relative;
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 0 24px 18vh;
+    }
+
+    .stage::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(1.5px 1.5px at 12% 22%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 31% 58%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 44% 12%, var(--white) 50%, transparent 51%),
+        radial-gradient(2px 2px at 57% 41%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 66% 74%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 78% 18%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 89% 62%, var(--white) 50%, transparent 51%),
+        radial-gradient(2px 2px at 8% 86%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 23% 42%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 52% 91%, var(--white) 50%, transparent 51%),
+        radial-gradient(1px 1px at 71% 33%, var(--white) 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 94% 88%, var(--white) 50%, transparent 51%),
+        radial-gradient(13% 6% at 27% 34%, rgba(255, 255, 255, .10), transparent 100%),
+        radial-gradient(11% 5% at 74% 63%, rgba(255, 255, 255, .08), transparent 100%),
+        radial-gradient(ellipse 90% 45% at 50% 120%, rgba(255, 255, 255, .3), transparent 62%);
+      pointer-events: none;
+    }
+
+    .stage::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 2px,
+        rgba(255, 255, 255, .025) 2px 3px
+      );
+      pointer-events: none;
+    }
+
+    .hero {
+      padding: clamp(6rem, 18vh, 10rem) 0 0;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: clamp(3.2rem, 12vw, 6.5rem);
+      line-height: .95;
+      letter-spacing: .01em;
+      text-transform: uppercase;
+      animation: rise .7s ease-out both;
+    }
+
+    .hero h1 .ghost {
+      display: block;
+      color: var(--white);
+      font-size: .62em;
+    }
+
+    @supports ((-webkit-text-stroke: 2px var(--white))) {
+      .hero h1 .ghost {
+        color: transparent;
+        -webkit-text-stroke: 2px var(--white);
+      }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .sub {
+      max-width: 34rem;
+      margin: 1.8rem auto 0;
+      color: var(--gray);
+      animation: rise .7s .15s ease-out both;
+    }
+
+    /* One plain column of prose, nothing boxed, nothing ruled. */
+    .prose {
+      max-width: 34rem;
+      margin: 14vh auto 0;
+      font-size: 17px;
+      line-height: 1.7;
+      animation: rise .7s .25s ease-out both;
+    }
+
+    .prose p { margin: 0 0 2rem; color: var(--gray); }
+
+    .prose p strong { color: var(--white); font-weight: bold; }
+
+    .prose a {
+      color: var(--white);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color .12s ease;
+    }
+
+    .prose a:hover,
+    .prose a:focus-visible { color: var(--gray-dark); background: var(--white); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero h1, .sub, .prose { animation: none; }
+      .prose a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <header class="hero">
+      <h1>
+        <span class="ghost">Meet</span>
+        Simply
+      </h1>
+      <p class="sub">Your new assistant, and the app that keeps it running on your side of the screen.</p>
+    </header>
+
+    <section class="prose" aria-label="About Simpld">
+      <p><strong>Simply</strong> is the assistant that lives inside <strong>Simpld</strong>. Open the app, pick a model from the built-in library, and Simply loads it onto your GPU and answers right there in the window. No server does the thinking: the model is the main character, and it lives on your disk.</p>
+
+      <p>Because everything runs on hardware you own, your code, your files and your questions never leave your machine. Replies come back fast and the internet can be switched off entirely. If the router dies mid-sprint, nothing about your workflow changes.</p>
+
+      <p>Simpld is open source and costs nothing. The model library carries several tiers, from small files that run on almost any machine to full-size weights for capable GPUs, so you only download what your hardware can lift. <a href="./index.html">Grab a build on the download page</a> and simply start.</p>
+    </section>
+  </main>
+</body>
+</html>

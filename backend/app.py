@@ -1,11 +1,11 @@
-"""FastAPI backend for the Pascal Code desktop app.
+"""FastAPI backend for the Simpld desktop app.
 
 Replaces ui.py's pywebview Api with HTTP + SSE so a React frontend (served by
 Vite in dev, by Electron from dist/ in prod) can drive the same SQLite store
 and the same llama.cpp models.
 
 Run:  python -m backend.app            -> http://127.0.0.1:8000
-       PASCAL_PORT=8001 python -m backend.app
+       SIMPLD_PORT=8001 python -m backend.app
 """
 
 from __future__ import annotations
@@ -26,9 +26,9 @@ from backend import config
 from backend.model import manager
 from backend.store import Store
 
-log = logging.getLogger("pascal.backend")
+log = logging.getLogger("simpld.backend")
 
-app = FastAPI(title="Pascal Code backend")
+app = FastAPI(title="Simpld backend")
 
 app.add_middleware(
     CORSMiddleware,
@@ -433,7 +433,7 @@ def main() -> None:
     import uvicorn
 
     multiprocessing.freeze_support()  # no-op unless frozen (PyInstaller on Windows)
-    print(f"Pascal Code backend on http://127.0.0.1:{config.PORT}", flush=True)
+    print(f"Simpld backend on http://127.0.0.1:{config.PORT}", flush=True)
     # Pass the app object (not an import string) so frozen executables,
     # which have no normal import system, can still serve.
     uvicorn.run(app, host="127.0.0.1", port=config.PORT, log_level="info")
